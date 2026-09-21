@@ -1,0 +1,6 @@
+# SHA-256 dos arquivos SISANT.csv da ANAC usados em cada edição.
+# Baixe em https://sistemas.anac.gov.br/dadosabertos/Aeronaves/drones%20cadastrados/SISANT.csv
+# e confira com: sha256sum SISANT.csv
+
+1a66fe110daa9f98841cae8e45922aba8c6b63206315f501b308391d9984f3ba  SISANT_2026-08-04.csv
+a1fa621da03496745ee5140b4f8f677839b4f51589daccca028dcdd34642f84a  SISANT_2026-09-20.csv

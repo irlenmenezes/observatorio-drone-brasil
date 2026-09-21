@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "Se usar estes dados ou este código, cite como abaixo."
+title: "Observatório do Drone no Brasil"
+type: dataset
+authors:
+  - family-names: Menezes
+    given-names: Irlen
+    affiliation: "Independente"
+version: "2026.09.2"
+date-released: "2026-09-21"
+url: "https://irlenmenezes.com.br/observatorio-drone-brasil/"
+repository-code: "https://github.com/irlenmenezes/observatorio-drone-brasil"
+license: MIT
+keywords:
+  - drone
+  - SISANT
+  - ANAC
+  - RPAS
+  - Brasil
+  - dados abertos
+abstract: "Apuração aberta e reproduzível do cadastro nacional de drones (SISANT/ANAC): total de aeronaves, série mensal de emissões, entradas e saídas entre bases, vencimentos, modelos e fabricantes mais cadastrados, ramo de atividade, faixa de peso, sede das empresas por UF e concentração da frota empresarial. Dados consolidados sob CC BY 4.0."

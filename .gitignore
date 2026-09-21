@@ -1,0 +1,26 @@
+# nunca versionar: credenciais e caminhos do servidor
+obs_rotina.env
+*.env
+
+# arquivos brutos da ANAC (públicos na fonte; não redistribuídos aqui) e derivados locais
+SISANT*.csv
+snapshots/
+cnpjs-frota.json
+obs-drone.json
+obs-drone.json.bak*
+obs-diff.json
+
+# saída gerada
+site/
+*.log
+obs_rotina_ultimo.txt
+
+# python / editor
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+Thumbs.db
+
+# copia datada que o obs_build.py grava ao lado do script (a versao publica esta em dados/)
+obs-drone-*.json
