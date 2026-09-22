@@ -22,6 +22,7 @@ DADOS = BASE / "obs-drone.json"
 _padrao = BASE.parent / "observatorio-drone"
 DESTINO = Path(os.environ.get("OBS_DESTINO") or (_padrao if _padrao.exists() else BASE / "site"))
 CANONICA = "https://irlenmenezes.com.br/observatorio-drone-brasil/"
+REPO = "https://github.com/irlenmenezes/observatorio-drone-brasil"  # codigo, edicoes e checksums
 
 d = json.loads(DADOS.read_text(encoding="utf-8"))
 META, RES = d["meta"], d["resumo"]
@@ -540,6 +541,9 @@ jsonld = json.dumps({
     "dateModified": META["data_base"],
     "version": META["data_base"],
     "isAccessibleForFree": True,
+    "sameAs": [REPO],
+    "citation": f"MENEZES, Irlen. Observatório do Drone no Brasil, base ANAC de {data_br(META['data_base'])}. "
+                f"Apuração sobre o SISANT. {CANONICA}",
     "measurementTechnique": "Contagem direta sobre o arquivo público SISANT (ANAC), com normalização "
                             "de fabricante, modelo e ramo de atividade; data de emissão derivada da "
                             "validade menos 24 meses; UF obtida pelo CNPJ na Receita Federal.",
@@ -926,6 +930,7 @@ html = f"""<!DOCTYPE html>
       <dt>Base ANAC</dt><dd>{data_br(META['data_base'])} · {num(META['registros'])} registros</dd>
       <dt>Processada em</dt><dd>{data_br(META['processado_em'][:10])}</dd>
       <dt>Método</dt><dd>versão {META.get('versao_metodo', '—')}</dd>
+      <dt>Código</dt><dd><a href="{REPO}" rel="noopener">github.com/irlenmenezes/observatorio-drone-brasil</a>: scripts, edições e checksum dos arquivos da ANAC, para reproduzir a apuração</dd>
       <dt>Licença</dt><dd><a href="https://creativecommons.org/licenses/by/4.0/deed.pt-br" rel="license noopener">CC BY 4.0</a>: use, cite e linke</dd>
       <dt>Baixar</dt><dd><a href="{JSON_ATUAL}">dados consolidados desta edição (JSON)</a> ·
        <a href="observatorio-drone-brasil.json">edição corrente</a> ·
