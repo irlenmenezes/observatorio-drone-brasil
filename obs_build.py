@@ -358,6 +358,49 @@ secoes.append(bloco(
     etiqueta="Prazo correndo"
 ))
 
+GRADE = {"RR": (3, 0), "AP": (5, 0), "AM": (2, 1), "PA": (4, 1), "MA": (5, 1), "CE": (6, 1), "RN": (7, 1),
+         "AC": (1, 2), "RO": (2, 2), "MT": (3, 2), "TO": (4, 2), "PI": (5, 2), "PE": (6, 2), "PB": (7, 2),
+         "MS": (3, 3), "GO": (4, 3), "BA": (5, 3), "SE": (6, 3), "AL": (7, 3),
+         "DF": (4, 4), "MG": (5, 4), "ES": (6, 4), "SP": (4, 5), "RJ": (5, 5),
+         "PR": (4, 6), "SC": (4, 7), "RS": (4, 8)}
+REGIAO = {"N": ("Norte", "var(--r-n)", ["AC", "AM", "AP", "PA", "RO", "RR", "TO"]),
+          "NE": ("Nordeste", "var(--r-ne)", ["AL", "BA", "CE", "MA", "PB", "PE", "PI", "RN", "SE"]),
+          "CO": ("Centro-Oeste", "var(--r-co)", ["DF", "GO", "MS", "MT"]),
+          "SE": ("Sudeste", "var(--r-se)", ["ES", "MG", "RJ", "SP"]),
+          "S": ("Sul", "var(--r-s)", ["PR", "RS", "SC"])}
+UF_REG = {u: k for k, (_, _, us) in REGIAO.items() for u in us}
+uf_emp_map = dict(d["uf"]["empresas"])
+
+
+def mapa_uf():
+    """Mapa em grade (cada estado um quadrado): cor = regiao, intensidade = empresas. Sem geometria externa."""
+    vmax = max(v for k, v in uf_emp_map.items() if k in GRADE)
+    T_, S_ = 62, 56
+    tiles = []
+    for uf, (c, r) in GRADE.items():
+        n = uf_emp_map.get(uf, 0)
+        a = 0.28 + 0.72 * math.sqrt(n / vmax)
+        cor = REGIAO[UF_REG[uf]][1]
+        txt = "var(--ink)" if a < 0.62 else "#fff"
+        x, y = c * T_, r * T_
+        tiles.append(f'<g class="ut"><title>{uf}: {num(n)} empresas</title>'
+                     f'<rect x="{x}" y="{y}" width="{S_}" height="{S_}" rx="4" fill="{cor}" fill-opacity="{a:.2f}"/>'
+                     f'<text x="{x + S_ / 2}" y="{y + 25}" text-anchor="middle" font-size="13" font-weight="500" fill="{txt}">{uf}</text>'
+                     f'<text x="{x + S_ / 2}" y="{y + 43}" text-anchor="middle" font-size="12" fill="{txt}">{num(n)}</text></g>')
+    svg = (f'<svg viewBox="0 0 {8 * T_} {9 * T_ - 6}" role="img" aria-label="Mapa em grade do Brasil com o número de empresas com drone por estado">'
+           + "".join(tiles) + '</svg>')
+    reg = []
+    for k, (nome, cor, us) in REGIAO.items():
+        tot = sum(uf_emp_map.get(u, 0) for u in us)
+        reg.append((tot, f'<li style="--c:{cor}"><span class="rn">{num(tot)}</span><div><b>{nome}</b>'
+                         f'<span>{" · ".join(us)}</span></div></li>'))
+    reg_html = "".join(h for _, h in sorted(reg, reverse=True))
+    ex = uf_emp_map.get("EX", 0)
+    return (f'<div class="mapa"><div>{svg}</div><div><ul class="reg">{reg_html}</ul>'
+            f'<p class="mapa-nota">Empresas por região, pela sede do CNPJ. Cor = região; quanto mais forte, mais empresas. '
+            f'Sede no exterior: {num(ex)}.</p></div></div>')
+
+
 cob = d["uf"]["cobertura"]
 secoes.append(bloco(
     "estados",
@@ -366,7 +409,7 @@ secoes.append(bloco(
     f"cadastrado ({pct(uf_emp[0][1] / total_emp)}), seguido por {esc(uf_emp[1][0])} "
     f"({num(uf_emp[1][1])}) e {esc(uf_emp[2][0])} ({num(uf_emp[2][1])}). O recorte é pela UF "
     f"do endereço cadastral do CNPJ, não por onde o drone voa.",
-    barras_h([(uf, n) for uf, n in uf_emp], total_ref=total_emp, limite=12),
+    mapa_uf() + barras_h([(uf, n) for uf, n in uf_emp], total_ref=total_emp, limite=12),
     nota="O arquivo da ANAC não traz estado nem município. A localização aqui vem do CNPJ "
          f"consultado na base da Receita, então cobre a fatia empresarial: {num(RES['pj'])} "
          f"registros de {num(T)} ({pct(RES['pj'] / T)}), em {num(cob['cnpjs_com_uf'])} CNPJs "
@@ -601,19 +644,21 @@ CSS = """
    Direção: jornalismo de dados impresso, não dashboard. Papel, serifa nos títulos,
    mono nos números e rótulos, uma tinta e um acento. Nada de gradiente, vidro,
    sombra colorida ou ornamento. Fontes locais (fonts/). */
-@font-face{font-family:"Source Serif 4";src:url(fonts/source-serif-4-var.woff2) format("woff2");font-weight:200 900;font-display:swap}
+@font-face{font-family:"Big Shoulders Display";src:url(fonts/big-shoulders-display-800.woff2) format("woff2");font-weight:700 900;font-display:swap}
 @font-face{font-family:"IBM Plex Mono";src:url(fonts/ibm-plex-mono-400.woff2) format("woff2");font-weight:400;font-display:swap}
 @font-face{font-family:"IBM Plex Mono";src:url(fonts/ibm-plex-mono-500.woff2) format("woff2");font-weight:500;font-display:swap}
 @font-face{font-family:"Inter";src:url(fonts/inter-latin.woff2) format("woff2");font-weight:100 900;font-display:swap}
 :root{
- --papel:#f6f3ec; --sup:#fbf9f4; --sup2:#efebe1;
- --ink:#1c1b18; --ink2:#5a574f; --mudo:#8a867c;
- --borda:#d9d4c7; --fio:#c8c2b2; --grade:#e6e1d4; --eixo:#9a958a;
- --tinta:#1f3a5f; --acento:#b5432d; --verde:#2f6f5e;
- --s1:#1f3a5f; --s2:#b5432d; --s3:#2f6f5e;
- --o1:#cfd9e6; --o2:#8ea6c2; --o3:#4f6f95; --o4:#1f3a5f;
- --linkc:#1f3a5f;
- --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+ --papel:#f2f4f2; --sup:#ffffff; --sup2:#e8ece9;
+ --ink:#14181d; --ink2:#56606b; --mudo:#7a848e;
+ --borda:#d7dde1; --fio:#c3cbd1; --grade:#dfe5e8; --eixo:#9aa5ad;
+ --tinta:#1d5a8a; --acento:#c2410c; --verde:#15803d; --hi:#d9961a;
+ --s1:#1d5a8a; --s2:#c2410c; --s3:#15803d;
+ --o1:#cfe0ee; --o2:#8fb4d1; --o3:#4f86b0; --o4:#1d5a8a;
+ --linkc:#1d5a8a;
+ --r-n:#4d8c3e; --r-ne:#7f5500; --r-co:#a584dc; --r-se:#8e3a6e; --r-s:#008caa;
+ --cond:"Big Shoulders Display","Barlow Condensed","Arial Narrow","Roboto Condensed",Impact,sans-serif;
+ --serif:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
  --sans:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
  color-scheme:light;
@@ -634,19 +679,23 @@ a:hover{text-decoration-color:currentColor}
 .hero{padding:56px 0 0}
 .hero-top{display:flex;justify-content:space-between;gap:24px;align-items:baseline;flex-wrap:wrap;
  padding-bottom:18px;border-bottom:1px solid var(--ink)}
-.hero-top .marca{font-family:var(--serif);font-weight:600;font-size:18px;letter-spacing:-.01em}
+.hero-top .marca{font-family:var(--serif);font-weight:800;font-size:19px;letter-spacing:-.02em}
+.atualiza{margin:0;padding:9px 0;border-bottom:1px solid var(--grade);font-family:var(--mono);font-size:12px;color:var(--ink2)}
+.atualiza b{color:var(--ink);font-weight:500}
+.tema{margin-left:12px;border:1px solid var(--fio);background:transparent;color:var(--ink);border-radius:999px;padding:4px 12px;font:500 11.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.tema:hover{border-color:var(--ink)}
 .hero-g{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);gap:48px;align-items:end;
  padding:40px 0 34px;border-bottom:1px solid var(--fio)}
-h1{font-family:var(--serif);font-weight:600;font-size:clamp(38px,5.2vw,64px);line-height:1.02;
- letter-spacing:-.02em;margin:18px 0 0;max-width:15ch}
-.sub{margin:22px 0 0;font-size:clamp(17px,1.6vw,20px);line-height:1.55;color:var(--ink2);max-width:52ch;
+h1{font-family:var(--serif);font-weight:800;font-size:clamp(34px,4.6vw,56px);line-height:1.04;
+ letter-spacing:-.03em;margin:18px 0 0;max-width:17ch}
+.sub{margin:22px 0 0;font-size:clamp(16px,1.5vw,19px);line-height:1.55;color:var(--ink2);max-width:54ch;
  font-family:var(--serif);font-weight:400}
 .fonte{margin:22px 0 0;font-size:13.5px;color:var(--ink2);line-height:1.6;max-width:60ch}
 .fonte.autor{margin-top:8px}
 .figura{border-left:1px solid var(--fio);padding-left:28px}
 .figura .fl{display:block}
-.figura .fv{display:block;font-family:var(--serif);font-weight:500;font-size:clamp(56px,7vw,92px);
- line-height:1;letter-spacing:-.03em;margin:10px 0 12px;font-variant-numeric:tabular-nums}
+.figura .fv{display:block;font-family:var(--cond);font-weight:800;font-size:clamp(64px,8.4vw,112px);
+ line-height:.9;letter-spacing:-.01em;margin:6px 0 10px;font-variant-numeric:tabular-nums}
 .figura .fd{font-size:14.5px;color:var(--ink2);line-height:1.55;margin:0}
 .fdelta{display:inline-block;margin-top:14px;font-family:var(--mono);font-size:12.5px;color:var(--acento);
  border-bottom:1px solid var(--acento);padding-bottom:2px}
@@ -654,31 +703,32 @@ h1{font-family:var(--serif);font-weight:600;font-size:clamp(38px,5.2vw,64px);lin
 /* --------------------------------------------------------------- figuras */
 .tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin-top:0;
  border-bottom:1px solid var(--fio)}
-.tile{padding:22px 22px 22px 0;border-right:1px solid var(--grade)}
-.tile:last-child{border-right:0}
-.tile+.tile{padding-left:22px}
+.tile{padding:16px 22px 18px 0;border-top:2px solid var(--ink);border-right:0;margin-right:22px}
+.tile:last-child{margin-right:0}
 .tile .tl{display:block;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
-.tile .tv{display:block;font-family:var(--serif);font-size:38px;font-weight:500;letter-spacing:-.02em;
- line-height:1.1;margin:8px 0 4px;color:var(--ink);font-variant-numeric:tabular-nums}
+.tile .tv{display:block;font-family:var(--cond);font-size:64px;font-weight:800;letter-spacing:0;
+ line-height:1;margin:6px 0 6px;color:var(--ink);font-variant-numeric:tabular-nums}
 .tile .td{font-size:13px;color:var(--mudo)}
 
 /* ----------------------------------------------------------- índice fixo */
 .idx{position:sticky;top:0;z-index:30;background:var(--papel);border-bottom:1px solid var(--fio);padding:0}
 .idx-in{display:flex;gap:26px;overflow-x:auto;scrollbar-width:none}
 .idx-in::-webkit-scrollbar{display:none}
-.idx a{white-space:nowrap;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;
- color:var(--ink2);text-decoration:none;padding:13px 0 11px;border-bottom:2px solid transparent}
-.idx a:hover{color:var(--ink);border-bottom-color:var(--ink)}
+.idx{padding:10px 0}
+.idx-in{gap:6px}
+.idx a{white-space:nowrap;font:600 13px var(--serif);color:var(--ink2);text-decoration:none;padding:7px 14px;border-radius:999px;border:1px solid transparent}
+.idx a:hover{color:var(--ink);border-color:var(--fio)}
+.idx a.on{background:var(--ink);color:var(--papel)}
 
 /* -------------------------------------------------------------- seções */
 main{padding-top:8px}
-.sec{padding:52px 0 40px;border-bottom:1px solid var(--fio)}
+.sec{padding:48px 0 38px;border-bottom:1px solid var(--fio)}
 .sec-h{display:grid;grid-template-columns:64px 1fr;gap:20px;margin-bottom:28px}
 .sec-n{font-family:var(--mono);font-size:13px;color:var(--acento);padding-top:14px;font-variant-numeric:tabular-nums}
-h2{font-family:var(--serif);font-size:clamp(26px,3.2vw,38px);font-weight:600;letter-spacing:-.015em;line-height:1.12;margin:0}
+h2{font-family:var(--serif);font-size:clamp(26px,3.2vw,38px);font-weight:800;letter-spacing:-.025em;line-height:1.1;margin:0}
 .sec-tag{display:inline-block;margin-top:12px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;
  text-transform:uppercase;color:var(--ink2)}
-.chapeu{margin:16px 0 0;font-size:18px;line-height:1.6;color:var(--ink);max-width:62ch;font-family:var(--serif)}
+.chapeu{margin:16px 0 0;font-size:17.5px;line-height:1.6;color:var(--ink);max-width:62ch;font-family:var(--serif)}
 .sec-c{padding-left:84px}
 
 /* ------------------------------------------------------ nota de método */
@@ -694,8 +744,8 @@ svg.ch{display:block;width:100%;min-width:640px;height:auto;overflow:visible;fon
 .eixo{stroke:var(--eixo);stroke-width:1}
 .tick{fill:var(--mudo);font-size:11px;font-family:var(--mono);font-variant-numeric:tabular-nums}
 .valor{fill:var(--ink);font-size:12.5px;font-weight:500;font-family:var(--mono)}
-.bar{fill:var(--tinta);opacity:.86}
-.bar.destaque{fill:var(--acento);opacity:1}
+.bar{fill:var(--tinta);opacity:.9}
+.bar.destaque{fill:var(--hi);opacity:1}
 .bar.parcial{fill:none;stroke:var(--tinta);stroke-width:1.2;stroke-dasharray:3 3;opacity:.8}
 .col:hover .bar{opacity:1}
 .hit{fill:transparent}
@@ -766,6 +816,20 @@ tbody tr:hover{background:var(--sup2)}
 footer{margin-top:0;padding:34px 0 60px;font-size:13.5px;color:var(--ink2)}
 footer p{margin:0 0 6px}
 
+/* ------------------------------------------------------------- mapa em grade */
+.mapa{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:36px;align-items:start;margin:4px 0 30px}
+.mapa svg{width:100%;height:auto;display:block}
+.mapa .ut text{font-family:var(--mono);pointer-events:none}
+.mapa .ut rect{stroke:var(--papel);stroke-width:2}
+.reg{margin:0;padding:0;list-style:none}
+.reg li{display:grid;grid-template-columns:minmax(96px,max-content) 1fr;gap:6px 18px;align-items:center;padding:12px 0;border-top:1px solid var(--grade)}
+.reg li:first-child{border-top:2px solid var(--ink)}
+.reg .rn{font-family:var(--cond);font-weight:800;font-size:44px;line-height:1;color:var(--c);white-space:nowrap}
+.reg li>div{min-width:0}
+.reg b{display:block;font-size:15px}
+.reg span{font-family:var(--mono);font-size:11px;color:var(--ink2);letter-spacing:.04em}
+.mapa-nota{font-family:var(--mono);font-size:11.5px;color:var(--mudo);margin:10px 0 0}
+@media(max-width:760px){.mapa{grid-template-columns:1fr}.reg li{grid-template-columns:1fr;gap:2px}.reg .rn{font-size:40px}.ficha{grid-template-columns:1fr;gap:2px}.ficha dd{overflow-wrap:anywhere;margin-bottom:10px}}
 /* ---------------------------------------------------------------- movimento */
 @keyframes preenche{from{width:0}to{width:var(--w)}}
 @media (prefers-reduced-motion:no-preference){
@@ -792,16 +856,23 @@ footer p{margin:0 0 6px}
 @media print{.idx,details,footer{display:none}}
 """
 
-ESCURO = ("--papel:#171614;--sup:#1d1c19;--sup2:#24221e;"
-          "--ink:#ece8dc;--ink2:#b3ae9f;--mudo:#87826f;"
-          "--borda:#3a3730;--fio:#4a463d;--grade:#2c2a25;--eixo:#6b665a;"
-          "--tinta:#9db6d6;--acento:#e07a62;--verde:#7fb8a5;"
-          "--s1:#9db6d6;--s2:#e07a62;--s3:#7fb8a5;"
-          "--o1:#3a4b60;--o2:#587494;--o3:#7f9dbf;--o4:#b9cbe2;"
-          "--linkc:#b9cbe2;color-scheme:dark;")
+ESCURO = ("--papel:#0f1317;--sup:#161b20;--sup2:#1d242b;"
+          "--ink:#eef1f3;--ink2:#a9b3bc;--mudo:#7d8791;"
+          "--borda:#2a323a;--fio:#37414a;--grade:#222a31;--eixo:#56626c;"
+          "--tinta:#7fb3dc;--acento:#f08a52;--verde:#5fc27f;--hi:#e8ae3c;"
+          "--s1:#7fb3dc;--s2:#f08a52;--s3:#5fc27f;"
+          "--o1:#27394a;--o2:#3f6788;--o3:#6aa0cc;--o4:#b5d4ec;"
+          "--linkc:#9ccbf0;color-scheme:dark;")
 CSS = CSS.replace("__ESCURO__", ESCURO)
 
-JS = ""  # (20/09/2026) sem video de fundo: a folha editorial nao usa
+JS = """<script>
+(function(){var r=document.documentElement,b=document.getElementById("tema");
+try{var t=localStorage.getItem("obs-tema");if(t)r.setAttribute("data-theme",t)}catch(e){}
+if(b)b.addEventListener("click",function(){var dk=r.getAttribute("data-theme")==="dark"||(!r.getAttribute("data-theme")&&matchMedia("(prefers-color-scheme:dark)").matches);var n=dk?"light":"dark";r.setAttribute("data-theme",n);try{localStorage.setItem("obs-tema",n)}catch(e){}});
+var links=[].slice.call(document.querySelectorAll(".idx a")),secs=links.map(function(a){return document.querySelector(a.getAttribute("href"))});
+if("IntersectionObserver" in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){links.forEach(function(a){a.classList.toggle("on",a.getAttribute("href")==="#"+e.target.id)})}})},{rootMargin:"-30% 0px -60% 0px"});secs.forEach(function(s){s&&io.observe(s)})}
+})();
+</script>"""
 
 html = f"""<!DOCTYPE html>
 <html lang="pt-BR">
@@ -817,8 +888,7 @@ html = f"""<!DOCTYPE html>
 <meta property="og:url" content="{CANONICA}">
 <meta property="og:locale" content="pt_BR">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#f6f3ec">
-<link rel="preload" href="fonts/source-serif-4-var.woff2" as="font" type="font/woff2" crossorigin>
+<meta name="theme-color" content="#f2f4f2">
 <script type="application/ld+json">{jsonld}</script>
 <style>{CSS}</style>
 </head>
@@ -828,8 +898,9 @@ html = f"""<!DOCTYPE html>
  <div class="wrap">
   <div class="hero-top">
    <span class="marca">Observatório do Drone no Brasil</span>
-   <span class="k">Dados abertos · base ANAC de {data_br(META['data_base'])}</span>
+   <span><span class="k">Dados abertos</span><button class="tema" id="tema" type="button" aria-label="Alternar tema claro e escuro">Tema</button></span>
   </div>
+  <p class="atualiza">Dados oficiais da ANAC, base de <b>{data_br(META['data_base'])}</b> · apurado em <b>{data_br(META['processado_em'][:10])}</b> · <a href="#metodologia">como apuramos</a></p>
   <div class="hero-g">
    <div>
     <span class="k">Relatório de cadastro · SISANT</span>
@@ -1012,16 +1083,6 @@ for v in ("hero-airspace.webm", "hero-airspace.mp4"):
     '<FilesMatch "\\.webm$">\n'
     "ForceType video/webm\n"
     "</FilesMatch>\n", encoding="utf-8", newline="\n")  # LF: no Windows o padrão vira CRLF
-
-# Pagina estatica fora do WordPress nao entra no sitemap do Yoast. Sem sitemap
-# proprio declarado no robots.txt, o Google so acha por link interno.
-(DESTINO / "sitemap.xml").write_text(
-    '<?xml version="1.0" encoding="UTF-8"?>\n'
-    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-    f' <url>\n  <loc>{CANONICA}</loc>\n'
-    f'  <lastmod>{META["data_base"]}</lastmod>\n'
-    '  <changefreq>monthly</changefreq>\n  <priority>0.9</priority>\n </url>\n'
-    '</urlset>\n', encoding="utf-8")
 
 kb = len(html.encode("utf-8")) / 1024
 print(f"gerado: {DESTINO / 'index.html'}  ({kb:.1f} KB)")

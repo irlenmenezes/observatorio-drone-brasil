@@ -83,7 +83,7 @@ Todas declaradas na página, embaixo de cada gráfico. As que mais mudam o resul
 | `dados/observatorio-drone-brasil-AAAA-MM-DD.json` | Resultados consolidados de cada edição. |
 | `dados/movimento-A-a-B.json` | Entradas, renovações e saídas entre duas bases. |
 | `checksums.txt` | SHA-256 dos arquivos da ANAC usados. |
-| `obs-fonts/` | Source Serif 4, IBM Plex Mono e Inter, licença OFL. |
+| `obs-fonts/` | Big Shoulders Display, IBM Plex Mono, Inter e Source Serif 4 (esta última não é mais usada na página), licença OFL. |
 
 Os JSONs em `dados/` são **consolidados e agregados**; os registros individuais estão no
 arquivo da ANAC. Os arquivos brutos não são redistribuídos aqui.
