@@ -1,0 +1,786 @@
+{
+ "meta": {
+  "fonte": "ANAC / SISANT",
+  "fonte_url": "https://sistemas.anac.gov.br/dadosabertos/Aeronaves/drones%20cadastrados/SISANT.csv",
+  "data_base": "2026-10-30",
+  "processado_em": "2026-10-30T21:37:40",
+  "versao_metodo": "2026.09.2",
+  "historico_metodo": [
+   {
+    "versao": "2026.08.1",
+    "mudanca": "primeira apuração pública: série por validade menos 24 meses, UF via Receita, ramos agrupados"
+   },
+   {
+    "versao": "2026.09.1",
+    "mudanca": "snapshot por base; modelos colapsados por família; códigos de modelo decifrados pela própria base"
+   },
+   {
+    "versao": "2026.09.2",
+    "mudanca": "comparação entre bases pelo código da aeronave; checagens de consistência antes de publicar; rótulos revisados (aeronaves em nome de CPF, modelos mais cadastrados, UF da sede)"
+   }
+  ],
+  "registros": 191572,
+  "validade_meses": 24,
+  "licenca": "CC BY 4.0",
+  "checagens": [
+   "PF + PJ = total",
+   "faixas de peso somam o total",
+   "prefixos de matricula somam o total",
+   "ramos agrupados somam o total",
+   "serie + descartados = total",
+   "vencimentos futuros + vencidos = total",
+   "frota PJ = registros com CNPJ valido",
+   "UF: resolvidos + sem resposta = CNPJs",
+   "premissa dos 24 meses",
+   "variacao do total contra a edicao anterior (190063) dentro de 15%"
+  ],
+  "conteudo": "Resultados consolidados e agregados apurados sobre o arquivo SISANT; nao contem os registros individuais. O arquivo bruto esta em fonte_url."
+ },
+ "resumo": {
+  "total": 191572,
+  "pf": 147521,
+  "pj": 44051,
+  "cnpjs": 11988,
+  "vencidos": 104,
+  "frota_pj": 44051
+ },
+ "serie": [
+  {
+   "mes": "2024-10",
+   "novos": 251,
+   "acumulado": 251
+  },
+  {
+   "mes": "2024-11",
+   "novos": 3745,
+   "acumulado": 3996
+  },
+  {
+   "mes": "2024-12",
+   "novos": 4061,
+   "acumulado": 8057
+  },
+  {
+   "mes": "2025-01",
+   "novos": 4596,
+   "acumulado": 12653
+  },
+  {
+   "mes": "2025-02",
+   "novos": 4668,
+   "acumulado": 17321
+  },
+  {
+   "mes": "2025-03",
+   "novos": 4984,
+   "acumulado": 22305
+  },
+  {
+   "mes": "2025-04",
+   "novos": 5266,
+   "acumulado": 27571
+  },
+  {
+   "mes": "2025-05",
+   "novos": 5328,
+   "acumulado": 32899
+  },
+  {
+   "mes": "2025-06",
+   "novos": 5255,
+   "acumulado": 38154
+  },
+  {
+   "mes": "2025-07",
+   "novos": 6327,
+   "acumulado": 44481
+  },
+  {
+   "mes": "2025-08",
+   "novos": 6450,
+   "acumulado": 50931
+  },
+  {
+   "mes": "2025-09",
+   "novos": 7744,
+   "acumulado": 58675
+  },
+  {
+   "mes": "2025-10",
+   "novos": 8012,
+   "acumulado": 66687
+  },
+  {
+   "mes": "2025-11",
+   "novos": 7819,
+   "acumulado": 74506
+  },
+  {
+   "mes": "2025-12",
+   "novos": 6212,
+   "acumulado": 80718
+  },
+  {
+   "mes": "2026-01",
+   "novos": 7331,
+   "acumulado": 88049
+  },
+  {
+   "mes": "2026-02",
+   "novos": 7099,
+   "acumulado": 95148
+  },
+  {
+   "mes": "2026-03",
+   "novos": 9415,
+   "acumulado": 104563
+  },
+  {
+   "mes": "2026-04",
+   "novos": 11468,
+   "acumulado": 116031
+  },
+  {
+   "mes": "2026-05",
+   "novos": 11942,
+   "acumulado": 127973
+  },
+  {
+   "mes": "2026-06",
+   "novos": 13777,
+   "acumulado": 141750
+  },
+  {
+   "mes": "2026-07",
+   "novos": 16711,
+   "acumulado": 158461
+  },
+  {
+   "mes": "2026-08",
+   "novos": 12488,
+   "acumulado": 170949
+  },
+  {
+   "mes": "2026-09",
+   "novos": 10936,
+   "acumulado": 181885
+  },
+  {
+   "mes": "2026-10",
+   "novos": 9586,
+   "acumulado": 191471,
+   "parcial": true,
+   "dias": 30
+  }
+ ],
+ "serie_nota": {
+  "inicio": "2024-10",
+  "descartados": 101,
+  "explicacao": "A serie cobre so a janela de 24 meses porque o arquivo da ANAC lista apenas cadastro vigente. Cada barra conta emissoes do mes, somando primeiro cadastro e renovacao."
+ },
+ "vencimentos": [
+  {
+   "mes": "2026-10",
+   "qtd": 248
+  },
+  {
+   "mes": "2026-11",
+   "qtd": 3745
+  },
+  {
+   "mes": "2026-12",
+   "qtd": 4061
+  },
+  {
+   "mes": "2027-01",
+   "qtd": 4596
+  },
+  {
+   "mes": "2027-02",
+   "qtd": 4668
+  },
+  {
+   "mes": "2027-03",
+   "qtd": 4984
+  },
+  {
+   "mes": "2027-04",
+   "qtd": 5266
+  },
+  {
+   "mes": "2027-05",
+   "qtd": 5328
+  },
+  {
+   "mes": "2027-06",
+   "qtd": 5255
+  },
+  {
+   "mes": "2027-07",
+   "qtd": 6327
+  },
+  {
+   "mes": "2027-08",
+   "qtd": 6450
+  },
+  {
+   "mes": "2027-09",
+   "qtd": 7744
+  },
+  {
+   "mes": "2027-10",
+   "qtd": 8012
+  },
+  {
+   "mes": "2027-11",
+   "qtd": 7819
+  },
+  {
+   "mes": "2027-12",
+   "qtd": 6212
+  },
+  {
+   "mes": "2028-01",
+   "qtd": 7331
+  },
+  {
+   "mes": "2028-02",
+   "qtd": 7099
+  },
+  {
+   "mes": "2028-03",
+   "qtd": 9415
+  },
+  {
+   "mes": "2028-04",
+   "qtd": 11468
+  },
+  {
+   "mes": "2028-05",
+   "qtd": 11942
+  },
+  {
+   "mes": "2028-06",
+   "qtd": 13777
+  },
+  {
+   "mes": "2028-07",
+   "qtd": 16711
+  },
+  {
+   "mes": "2028-08",
+   "qtd": 12488
+  },
+  {
+   "mes": "2028-09",
+   "qtd": 10936
+  },
+  {
+   "mes": "2028-10",
+   "qtd": 9586
+  }
+ ],
+ "uso": {
+  "prefixo": {
+   "PR": 75775,
+   "PP": 114843,
+   "PS": 954
+  },
+  "tipo": {
+   "Básico": 190618,
+   "Avançado": 954
+  }
+ },
+ "ramos": {
+  "Recreativo": 76474,
+  "Cinema e fotografia": 46920,
+  "Agricola / pulverizacao": 14213,
+  "Aerolevantamento e topografia": 9821,
+  "Show de luzes e publicidade": 9677,
+  "Seguranca publica e defesa civil": 8796,
+  "Inspecao tecnica": 8131,
+  "Outros": 7118,
+  "Nao informado": 3669,
+  "Fiscalizacao e orgaos estatais": 2668,
+  "Treinamento": 2547,
+  "Experimental": 758,
+  "Reportagem": 658,
+  "Transporte de carga": 122
+ },
+ "modelos": [
+  {
+   "modelo": "MINI 3",
+   "qtd": 19786
+  },
+  {
+   "modelo": "MINI 4 PRO",
+   "qtd": 14257
+  },
+  {
+   "modelo": "MINI 2",
+   "qtd": 9645
+  },
+  {
+   "modelo": "MINI 5 PRO",
+   "qtd": 7768
+  },
+  {
+   "modelo": "NEO 2",
+   "qtd": 7410
+  },
+  {
+   "modelo": "NEO",
+   "qtd": 6766
+  },
+  {
+   "modelo": "MINI 3 PRO",
+   "qtd": 6606
+  },
+  {
+   "modelo": "MAVIC 3",
+   "qtd": 6191
+  },
+  {
+   "modelo": "AIR 2S",
+   "qtd": 5648
+  },
+  {
+   "modelo": "MATRICE",
+   "qtd": 5244
+  },
+  {
+   "modelo": "MAVIC 2",
+   "qtd": 3848
+  },
+  {
+   "modelo": "AVATA 2",
+   "qtd": 3625
+  },
+  {
+   "modelo": "AIR 3S",
+   "qtd": 3584
+  },
+  {
+   "modelo": "AGRAS",
+   "qtd": 3393
+  },
+  {
+   "modelo": "MAVIC PRO",
+   "qtd": 3369
+  },
+  {
+   "modelo": "AVATA",
+   "qtd": 3367
+  },
+  {
+   "modelo": "PHANTOM 4",
+   "qtd": 3364
+  },
+  {
+   "modelo": "MINI 4K",
+   "qtd": 3058
+  },
+  {
+   "modelo": "MAVIC AIR 2",
+   "qtd": 2976
+  },
+  {
+   "modelo": "LITO X1",
+   "qtd": 2962
+  },
+  {
+   "modelo": "MAVIC",
+   "qtd": 2940
+  },
+  {
+   "modelo": "MINI",
+   "qtd": 2854
+  },
+  {
+   "modelo": "AIR 3",
+   "qtd": 2848
+  },
+  {
+   "modelo": "FLIP",
+   "qtd": 2785
+  },
+  {
+   "modelo": "STAR V3 1",
+   "qtd": 2081
+  },
+  {
+   "modelo": "AGRAS T40",
+   "qtd": 2021
+  },
+  {
+   "modelo": "DMD V3",
+   "qtd": 1953
+  },
+  {
+   "modelo": "AGRAS T50",
+   "qtd": 1911
+  },
+  {
+   "modelo": "AGRAS T25",
+   "qtd": 1890
+  },
+  {
+   "modelo": "MINI SE",
+   "qtd": 1728
+  }
+ ],
+ "fabricantes": [
+  {
+   "marca": "DJI",
+   "qtd": 163664
+  },
+  {
+   "marca": "Xiaomi / FIMI",
+   "qtd": 4672
+  },
+  {
+   "marca": "Damoda",
+   "qtd": 3059
+  },
+  {
+   "marca": "Nova Sky Stories",
+   "qtd": 2031
+  },
+  {
+   "marca": "SMD Baltic",
+   "qtd": 1600
+  },
+  {
+   "marca": "XAG",
+   "qtd": 1288
+  },
+  {
+   "marca": "Outro",
+   "qtd": 1173
+  },
+  {
+   "marca": "Lyzrc",
+   "qtd": 944
+  },
+  {
+   "marca": "Shanghai",
+   "qtd": 656
+  },
+  {
+   "marca": "SJRC",
+   "qtd": 594
+  },
+  {
+   "marca": "Genai",
+   "qtd": 452
+  },
+  {
+   "marca": "Fabricacao",
+   "qtd": 442
+  }
+ ],
+ "peso": {
+  "250 g a 2 kg": 121495,
+  "Acima de 25 kg": 14612,
+  "2 a 25 kg": 8786,
+  "Ate 250 g": 46679
+ },
+ "concentracao": [
+  {
+   "top": 50,
+   "aeronaves": 14601,
+   "share": 0.3315
+  },
+  {
+   "top": 100,
+   "aeronaves": 16960,
+   "share": 0.385
+  },
+  {
+   "top": 250,
+   "aeronaves": 20948,
+   "share": 0.4755
+  },
+  {
+   "top": 500,
+   "aeronaves": 24045,
+   "share": 0.5458
+  },
+  {
+   "top": 1000,
+   "aeronaves": 27299,
+   "share": 0.6197
+  },
+  {
+   "top": 2000,
+   "aeronaves": 31017,
+   "share": 0.7041
+  },
+  {
+   "top": 4000,
+   "aeronaves": 35482,
+   "share": 0.8055
+  }
+ ],
+ "top_operadores": [
+  {
+   "nome": "GOOD LUCK PARTICIPAÇÕES SOCIETÁRIAS LTDA",
+   "frota": 2312,
+   "ramo": "Aeropublicidade – Exposição de letreiros luminosos",
+   "uf": "PR"
+  },
+  {
+   "nome": "CYBERDRONE",
+   "frota": 1600,
+   "ramo": "Aeropublicidade – Exposição de letreiros luminosos",
+   "uf": "SP"
+  },
+  {
+   "nome": "VISUALFARM",
+   "frota": 1133,
+   "ramo": "Aeropublicidade – Exposição de letreiros luminosos",
+   "uf": "SP"
+  },
+  {
+   "nome": "Nova Sky",
+   "frota": 1053,
+   "ramo": "Aerodemonstração",
+   "uf": "EX"
+  },
+  {
+   "nome": "Nova Sky Stories",
+   "frota": 1030,
+   "ramo": "Aerodemonstração",
+   "uf": "SP"
+  },
+  {
+   "nome": "Magic Drone",
+   "frota": 654,
+   "ramo": "Aeropublicidade – Exposição de letreiros luminosos",
+   "uf": "SP"
+  },
+  {
+   "nome": "TAKE SERVICOS",
+   "frota": 600,
+   "ramo": "Aeropublicidade – Exposição de letreiros luminosos",
+   "uf": "RJ"
+  },
+  {
+   "nome": "POLÍCIA MILITAR DO ESTADO DO PARANÁ",
+   "frota": 468,
+   "ramo": "Segurança Pública e/ou Defesa Civil",
+   "uf": "PR"
+  },
+  {
+   "nome": "PMMG2",
+   "frota": 370,
+   "ramo": "Segurança Pública e/ou Defesa Civil",
+   "uf": "MG"
+  },
+  {
+   "nome": "POLICIA MILITAR",
+   "frota": 345,
+   "ramo": "Segurança Pública e/ou Defesa Civil",
+   "uf": "SP"
+  },
+  {
+   "nome": "POLICIA MILITAR DO ESTADO DE SANTA CATARINA",
+   "frota": 331,
+   "ramo": "Segurança Pública e/ou Defesa Civil",
+   "uf": "SC"
+  },
+  {
+   "nome": "IBAMA/CGFIN - COORDENACAO GERAL DE FINANCAS",
+   "frota": 231,
+   "ramo": "Órgãos de Fiscalização - Entidades Estatais",
+   "uf": "DF"
+  },
+  {
+   "nome": "SUPERINTENDÊNCIA DA POLÍCIA TÉCNICO-CIENTÍFICA",
+   "frota": 212,
+   "ramo": "Segurança Pública e/ou Defesa Civil",
+   "uf": "SP"
+  },
+  {
+   "nome": "XMOBOTS AEROESPACIAL E DEFESA LTDA",
+   "frota": 206,
+   "ramo": "Pulverização e aplicação de outros insumos - Aeroagrícola",
+   "uf": "SP"
+  },
+  {
+   "nome": "CEMIG",
+   "frota": 197,
+   "ramo": "Aeroinspeção",
+   "uf": "MG"
+  },
+  {
+   "nome": "COPEL-DIS",
+   "frota": 197,
+   "ramo": "Aeroinspeção",
+   "uf": "PR"
+  },
+  {
+   "nome": "Secretaria da Receita Federal do Brasil",
+   "frota": 192,
+   "ramo": "Órgãos de Fiscalização - Entidades Estatais",
+   "uf": "DF"
+  },
+  {
+   "nome": "BRIGADA MILITAR",
+   "frota": 174,
+   "ramo": "Segurança Pública e/ou Defesa Civil",
+   "uf": "RS"
+  },
+  {
+   "nome": "POLÍCIA JUDICIÁRIA CIVIL - PJC",
+   "frota": 166,
+   "ramo": "Segurança Pública e/ou Defesa Civil",
+   "uf": "MT"
+  },
+  {
+   "nome": "POLICIA MILITAR DO ESTADO DO ESPIRITO SANTO",
+   "frota": 163,
+   "ramo": "Segurança Pública e/ou Defesa Civil",
+   "uf": "ES"
+  }
+ ],
+ "uf": {
+  "empresas": {
+   "PR": 872,
+   "SP": 2683,
+   "EX": 1,
+   "RJ": 648,
+   "MG": 1535,
+   "SC": 778,
+   "DF": 224,
+   "RS": 698,
+   "MT": 588,
+   "ES": 451,
+   "BA": 497,
+   "MS": 282,
+   "GO": 444,
+   "PB": 92,
+   "PA": 392,
+   "RN": 125,
+   "TO": 145,
+   "PE": 299,
+   "SE": 97,
+   "RO": 264,
+   "MA": 231,
+   "PI": 68,
+   "CE": 202,
+   "RR": 52,
+   "AC": 43,
+   "AP": 36,
+   "AL": 103,
+   "AM": 121
+  },
+  "frota": {
+   "PR": 5124,
+   "SP": 12273,
+   "EX": 1053,
+   "RJ": 2904,
+   "MG": 4875,
+   "SC": 2151,
+   "DF": 1692,
+   "RS": 1844,
+   "MT": 1412,
+   "ES": 1369,
+   "BA": 1367,
+   "MS": 910,
+   "GO": 1063,
+   "PB": 370,
+   "PA": 1045,
+   "RN": 405,
+   "TO": 376,
+   "PE": 761,
+   "SE": 241,
+   "RO": 585,
+   "MA": 610,
+   "PI": 205,
+   "CE": 503,
+   "RR": 140,
+   "AC": 172,
+   "AP": 141,
+   "AL": 208,
+   "AM": 234
+  },
+  "frota_sem_enxame": {
+   "PR": 2811,
+   "MG": 4773,
+   "SP": 7808,
+   "SC": 2127,
+   "DF": 1692,
+   "RS": 1842,
+   "MT": 1412,
+   "ES": 1367,
+   "BA": 1364,
+   "RJ": 2148,
+   "GO": 1063,
+   "PB": 370,
+   "PA": 1045,
+   "RN": 405,
+   "MS": 762,
+   "TO": 375,
+   "PE": 759,
+   "SE": 241,
+   "RO": 585,
+   "MA": 610,
+   "PI": 205,
+   "CE": 502,
+   "RR": 140,
+   "AC": 172,
+   "AP": 141,
+   "AL": 208,
+   "AM": 233
+  },
+  "municipios": {
+   "Sao Paulo/SP": 706,
+   "Rio De Janeiro/RJ": 362,
+   "Belo Horizonte/MG": 343,
+   "Curitiba/PR": 239,
+   "Brasilia/DF": 224,
+   "Porto Alegre/RS": 158,
+   "Salvador/BA": 155,
+   "Goiania/GO": 138,
+   "Recife/PE": 131,
+   "Fortaleza/CE": 112,
+   "Campo Grande/MS": 107,
+   "Cuiaba/MT": 101,
+   "Manaus/AM": 101,
+   "Florianopolis/SC": 95,
+   "Campinas/SP": 91,
+   "Vitoria/ES": 85,
+   "Belem/PA": 77,
+   "Sao Luis/MA": 73,
+   "Sao Jose Dos Campos/SP": 67,
+   "Ribeirao Preto/SP": 67,
+   "Natal/RN": 65,
+   "Aracaju/SE": 63,
+   "Maceio/AL": 62,
+   "Porto Velho/RO": 60,
+   "Uberlandia/MG": 58,
+   "Joao Pessoa/PB": 56,
+   "Piracicaba/SP": 53,
+   "Palmas/TO": 51,
+   "Joinville/SC": 50,
+   "Barueri/SP": 47
+  },
+  "cobertura": {
+   "cnpjs_total": 11988,
+   "cnpjs_com_uf": 11971,
+   "cnpjs_sem_uf": 17,
+   "frota_sem_uf": 18
+  }
+ },
+ "apelidos_decifrados": {
+  "MT2PD": "MINI 2",
+  "DA2SUE1": "AIR 2S",
+  "M1P": "MAVIC PRO",
+  "DF1A0424": "FLIP",
+  "CZ3SCL": "AIR 3S",
+  "MM1A": "SPARK",
+  "M4E": "MATRICE 4E",
+  "U11X": "MAVIC AIR"
+ }
+}

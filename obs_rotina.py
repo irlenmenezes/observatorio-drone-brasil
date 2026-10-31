@@ -130,7 +130,7 @@ def main():
         RESUMO.write_text(f"{dt.datetime.now():%d/%m/%Y %H:%M}: base {nova} apurada e gerada em {SAIDA} (sem publicar).\n", encoding="utf-8")
         return 0
     # dados/ leva a edicao datada e o diff: cada base publicada fica conferivel depois
-    tarcmd = [TAR, "-C", str(SAIDA), "-cf", "-", "index.html", "observatorio-drone-brasil.json", "sitemap.xml", "dados"]
+    tarcmd = [TAR, "-C", str(SAIDA), "-cf", "-", "index.html", "observatorio-drone-brasil.json", "sitemap.xml", "dados", "irlen-mark.webp"]
     remoto = (f"set -e; cd {REMOTO} && cp index.html ~/observatorio-index.bak_{nova.replace('-', '')} && tar -xf - "
               f"&& cd .. && wp litespeed-purge all | tail -1")
     log("publicando...")

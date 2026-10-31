@@ -565,6 +565,36 @@ INDICE = [("crescimento", "Crescimento")] + ([("movimento", "Entradas e saídas"
           ("peso", "Peso"), ("concentracao", "Concentração"), ("metodologia", "Metodologia"),
           ("dados", "Dados e citação")]
 indice = "".join(f'<a href="#{i}">{t}</a>' for i, t in INDICE)
+
+ICO = {
+ "topo": '<rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/>',
+ "crescimento": '<path d="M3 17l6-6 4 4 7-8"/><path d="M15 7h5v5"/>',
+ "estados": '<path d="M12 21s-7-6.1-7-11a7 7 0 0114 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+ "modelos": '<circle cx="6" cy="6" r="2.6"/><circle cx="18" cy="6" r="2.6"/><circle cx="6" cy="18" r="2.6"/><circle cx="18" cy="18" r="2.6"/><path d="M8 8l8 8M16 8l-8 8"/><rect x="10" y="10" width="4" height="4" rx="1"/>',
+ "mais": '<path d="M12 5v14M5 12h14"/>',
+}
+
+
+def _dock_item(i, rot):
+    return (f'<a href="#{i}" data-s="{i}"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true">{ICO[i]}</svg></span>'
+            f'<span class="lb">{rot}</span></a>')
+
+
+dock_html = (
+    '<nav class="dock" aria-label="Navegação principal">'
+    + _dock_item("topo", "Panorama") + _dock_item("crescimento", "Crescimento")
+    + '<a class="mais" href="#explorar" role="button" aria-controls="explorar" aria-expanded="false"><span class="ic">'
+      f'<svg viewBox="0 0 24 24" aria-hidden="true">{ICO["mais"]}</svg></span><span class="lb">Explorar</span></a>'
+    + _dock_item("estados", "Estados") + _dock_item("modelos", "Modelos")
+    + '</nav>'
+    '<div class="sheet" id="explorar" role="dialog" aria-modal="true" aria-labelledby="sh-t">'
+    '<a class="sheet-bg" href="#topo" aria-label="Fechar"></a>'
+    '<div class="sheet-in"><div class="sheet-h"><h2 id="sh-t">Explorar o Observatório</h2>'
+    '<a class="sheet-x" href="#topo" aria-label="Fechar">&times;</a></div><div class="sheet-g">'
+    + '<a href="#topo"><span>00</span>Panorama</a>'
+    + "".join(f'<a href="#{i}"><span>{n:02d}</span>{t}</a>' for n, (i, t) in enumerate(INDICE, 1))
+    + '</div></div></div>'
+)
 N_RECORTES = len(secoes)
 POR_EXTENSO = {9: "Nove", 10: "Dez", 11: "Onze", 12: "Doze"}
 JSON_ATUAL = f"dados/observatorio-drone-brasil-{META['data_base']}.json"
@@ -677,9 +707,14 @@ a:hover{text-decoration-color:currentColor}
 
 /* ---------------------------------------------------------------- hero */
 .hero{padding:56px 0 0}
-.hero-top{display:flex;justify-content:space-between;gap:24px;align-items:baseline;flex-wrap:wrap;
+.hero-top{display:flex;justify-content:space-between;gap:24px;align-items:center;flex-wrap:wrap;
  padding-bottom:18px;border-bottom:1px solid var(--ink)}
-.hero-top .marca{font-family:var(--serif);font-weight:800;font-size:19px;letter-spacing:-.02em}
+.hero-top .marca{display:flex;align-items:center;gap:10px;font-family:var(--serif);letter-spacing:-.02em}
+.hero-top .marca img{width:26px;height:26px;display:block;flex:none}
+.hero-top .marca-t{display:flex;flex-direction:column;gap:1px;line-height:1.2}
+.hero-top .marca-n{font-weight:700;font-size:15px}
+.hero-top .marca-p{font-family:var(--sans);font-weight:400;font-size:12px;letter-spacing:0;color:var(--ink2)}
+@media(min-width:640px){.hero-top .marca-t{flex-direction:row;align-items:baseline;gap:8px}}
 .atualiza{margin:0;padding:9px 0;border-bottom:1px solid var(--grade);font-family:var(--mono);font-size:12px;color:var(--ink2)}
 .atualiza b{color:var(--ink);font-weight:500}
 .tema{margin-left:12px;border:1px solid var(--fio);background:transparent;color:var(--ink);border-radius:999px;padding:4px 12px;font:500 11.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
@@ -854,6 +889,45 @@ footer p{margin:0 0 6px}
  .tile .tv{font-size:32px}
 }
 @media print{.idx,details,footer{display:none}}
+
+/* ---- dock inferior (mobile) estilo Politicometro ---- */
+.dock,.sheet{display:none}
+@media (max-width:900px){
+ .idx{display:none}
+ body{padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+ .dock{position:fixed;left:0;right:0;bottom:0;z-index:60;display:grid;grid-template-columns:repeat(5,1fr);align-items:end;
+  background:var(--sup);border-top:1px solid var(--fio);padding:6px 4px calc(8px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 20px rgba(0,0,0,.08)}
+ .dock a{display:flex;flex-direction:column;align-items:center;gap:3px;min-height:52px;padding:2px 2px 0;color:var(--ink2);
+  text-decoration:none;font:600 11.5px/1.15 var(--sans);text-align:center;-webkit-tap-highlight-color:transparent}
+ .dock .ic{display:grid;place-items:center;width:52px;height:30px;border-radius:999px;transition:background .15s}
+ .dock .ic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+ .dock a.on{color:var(--ink)}
+ .dock a.on .ic{background:var(--sup2)}
+ .dock a.on .lb{font-weight:700}
+ .dock a:focus-visible{outline:2px solid var(--tinta);outline-offset:2px;border-radius:10px}
+ .dock .mais{margin-top:-30px;color:var(--ink)}
+ .dock .mais .ic{width:58px;height:58px;border-radius:50%;background:var(--ink);color:var(--papel);
+  box-shadow:0 0 0 4px var(--sup),0 0 0 5px var(--fio),0 8px 20px rgba(0,0,0,.28)}
+ .dock .mais.on .ic{background:var(--ink)}
+ .dock .mais .ic svg{width:26px;height:26px;stroke-width:2.2}
+ .dock .mais .lb{margin-top:5px}
+ .sheet{position:fixed;inset:0;z-index:70}
+ .sheet:target,.sheet.aberto{display:block}
+ .sheet-bg{position:absolute;inset:0;background:rgba(10,14,18,.55)}
+ .sheet-in{position:absolute;left:0;right:0;bottom:0;max-height:82vh;overflow:auto;background:var(--sup);border-radius:18px 18px 0 0;
+  padding:16px 16px calc(24px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 30px rgba(0,0,0,.3);animation:obs-up .22s ease-out}
+ .sheet-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+ .sheet-h h2{font:600 17px var(--sans);margin:0;color:var(--ink)}
+ .sheet-x{font-size:28px;line-height:1;color:var(--ink2);padding:4px 12px;text-decoration:none}
+ .sheet-g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+ .sheet-g a{display:flex;gap:10px;align-items:baseline;padding:13px 12px;border:1px solid var(--fio);border-radius:12px;
+  color:var(--ink);text-decoration:none;font:600 14px/1.25 var(--sans)}
+ .sheet-g a span{font:500 11px var(--mono);color:var(--mudo)}
+ .sheet-g a:focus-visible{outline:2px solid var(--tinta);outline-offset:2px}
+}
+@keyframes obs-up{from{transform:translateY(24px);opacity:.4}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.sheet-in{animation:none}.dock .ic{transition:none}}
+@media print{.dock,.sheet{display:none!important}}
 """
 
 ESCURO = ("--papel:#0f1317;--sup:#161b20;--sup2:#1d242b;"
@@ -871,6 +945,20 @@ try{var t=localStorage.getItem("obs-tema");if(t)r.setAttribute("data-theme",t)}c
 if(b)b.addEventListener("click",function(){var dk=r.getAttribute("data-theme")==="dark"||(!r.getAttribute("data-theme")&&matchMedia("(prefers-color-scheme:dark)").matches);var n=dk?"light":"dark";r.setAttribute("data-theme",n);try{localStorage.setItem("obs-tema",n)}catch(e){}});
 var links=[].slice.call(document.querySelectorAll(".idx a")),secs=links.map(function(a){return document.querySelector(a.getAttribute("href"))});
 if("IntersectionObserver" in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){links.forEach(function(a){a.classList.toggle("on",a.getAttribute("href")==="#"+e.target.id)})}})},{rootMargin:"-30% 0px -60% 0px"});secs.forEach(function(s){s&&io.observe(s)})}
+})();
+
+(function(){var d=document.querySelector(".dock");if(!d)return;
+var sh=document.getElementById("explorar"),mais=d.querySelector(".mais");
+function abre(){sh.classList.add("aberto");mais.setAttribute("aria-expanded","true");document.body.style.overflow="hidden";var f=sh.querySelector(".sheet-g a");if(f)f.focus()}
+function fecha(){sh.classList.remove("aberto");mais.setAttribute("aria-expanded","false");document.body.style.overflow="";if(location.hash==="#explorar")history.replaceState(null,"",location.pathname+location.search);mais.focus()}
+mais.addEventListener("click",function(e){e.preventDefault();sh.classList.contains("aberto")?fecha():abre()});
+sh.addEventListener("click",function(e){var a=e.target.closest("a");if(!a)return;if(a.classList.contains("sheet-bg")||a.classList.contains("sheet-x")){e.preventDefault();fecha()}else{sh.classList.remove("aberto");mais.setAttribute("aria-expanded","false");document.body.style.overflow=""}});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&sh.classList.contains("aberto"))fecha()});
+var abas=[].slice.call(d.querySelectorAll("a[data-s]")),ids=abas.map(function(a){return a.getAttribute("data-s")});
+var ordem=[].slice.call(document.querySelectorAll("main .sec")).map(function(s){return s.id});ordem.unshift("topo");
+function atual(){var y=innerHeight*0.35,cur="topo";ordem.forEach(function(id){var el=document.getElementById(id);if(el&&el.getBoundingClientRect().top<=y)cur=id});return cur}
+var tick=false;function marca(){tick=false;var c=atual(),achou=ids.indexOf(c)>-1;abas.forEach(function(a){var on=a.getAttribute("data-s")===c;a.classList.toggle("on",on);if(on)a.setAttribute("aria-current","true");else a.removeAttribute("aria-current")});mais.classList.toggle("on",!achou)}
+addEventListener("scroll",function(){if(!tick){tick=true;requestAnimationFrame(marca)}},{passive:true});addEventListener("resize",marca);marca();
 })();
 </script>"""
 
@@ -894,10 +982,11 @@ html = f"""<!DOCTYPE html>
 </head>
 <body>
 
+<span id="topo"></span>
 <header class="hero">
  <div class="wrap">
   <div class="hero-top">
-   <span class="marca">Observatório do Drone no Brasil</span>
+   <span class="marca"><img src="irlen-mark.webp" width="26" height="26" alt="" decoding="async"><span class="marca-t"><span class="marca-n">Observatório do Drone no Brasil</span><span class="marca-p">por Irlen Menezes</span></span></span>
    <span><span class="k">Dados abertos</span><button class="tema" id="tema" type="button" aria-label="Alternar tema claro e escuro">Tema</button></span>
   </div>
   <p class="atualiza">Dados oficiais da ANAC, base de <b>{data_br(META['data_base'])}</b> · apurado em <b>{data_br(META['processado_em'][:10])}</b> · <a href="#metodologia">como apuramos</a></p>
@@ -1035,6 +1124,7 @@ Apuração sobre o SISANT. Disponível em: {CANONICA}</code>
    <a href="observatorio-drone-brasil.json">JSON</a></p>
  </div>
 </footer>
+{dock_html}
 {JS}
 </body>
 </html>
@@ -1057,6 +1147,7 @@ if DIFF:
     shutil.copy(DIFF_ARQ, DESTINO / "dados" / f"movimento-{DIFF['base_anterior']}-a-{DIFF['base_atual']}.json")
 
 # fontes locais (20/09/2026)
+shutil.copy(BASE / "obs-irlen-mark.webp", DESTINO / "irlen-mark.webp")
 (DESTINO / "fonts").mkdir(exist_ok=True)
 for f in (BASE / "obs-fonts").glob("*.woff2"):
     shutil.copy(f, DESTINO / "fonts" / f.name)
