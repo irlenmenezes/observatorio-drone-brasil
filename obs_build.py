@@ -302,14 +302,19 @@ if DIFF:
         for i, (r, v, c) in enumerate(mov)) + "</div>"
     secoes.append(bloco(
         "movimento",
-        "O que entrou e o que saiu entre duas bases",
+        f"O que entrou e o que saiu em {dias} dias",
         f"Entre {de} e {ate} o arquivo cresceu {num(saldo)} registros, mas esse número é um saldo. "
         f"Entraram {num(novos_cod)} códigos novos e saíram {num(saidas)}; outros {num(renov)} "
         f"cadastros foram renovados. Todo dia entram cerca de {num(round(novos_cod / dias))} "
         f"aeronaves e saem {num(round(saidas / dias))}.",
         mov_html,
         nota=f"Comparação código a código (CODIGO_AERONAVE) entre os dois arquivos guardados, de "
-             f"{de} e {ate}, {dias} dias. <strong>Código novo</strong> é o que não existia no arquivo "
+             f"{de} e {ate}, {dias} dias"
+             + (". A janela padrão é de 30 dias; não havia base arquivada exatamente nessa distância, "
+                "então esta é a mais próxima" if DIFF.get("janela_ajustada")
+                else ", a janela padrão do Observatório (cerca de 30 dias entre a base atual e a anterior, "
+                     "para que os períodos sejam comparáveis entre edições)")
+             + f". <strong>Código novo</strong> é o que não existia no arquivo "
              f"anterior; <strong>renovação</strong> é o mesmo código com validade adiantada; "
              f"<strong>saída</strong> é o código que estava e não está mais. Das saídas, "
              f"{num(DIFF['saidas_ja_vencidas'])} tinham validade até {ate} (venceram) e "
@@ -334,7 +339,7 @@ if DIFF:
             f"Movimento do cadastro entre as bases de {de} e {ate}. Fonte: ANAC, dois arquivos SISANT "
             f"comparados pelo código da aeronave."),
         rotulo_tab="Ver a decomposição completa",
-        etiqueta=f"{dias} dias, duas bases"
+        etiqueta=f"{dias} dias, janela fixa"
     ))
 
 secoes.append(bloco(

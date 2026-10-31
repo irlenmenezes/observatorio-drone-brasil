@@ -7,7 +7,7 @@ Este repositório guarda o código que faz a apuração, os resultados consolida
 edição e o checksum de cada arquivo da ANAC usado. Qualquer pessoa consegue baixar o mesmo
 arquivo na ANAC, rodar os mesmos scripts e chegar aos mesmos números.
 
-Edição corrente: **base ANAC de 20/09/2026, 186.016 registros, método 2026.09.2.**
+Edição corrente: **base ANAC de 30/10/2026, 191.572 registros, método 2026.10.1.**
 
 ## O que é medido
 

@@ -6,8 +6,8 @@ authors:
   - family-names: Menezes
     given-names: Irlen
     affiliation: "Independente"
-version: "2026.09.2"
-date-released: "2026-09-21"
+version: "2026.10.1"
+date-released: "2026-10-30"
 url: "https://irlenmenezes.com.br/observatorio-drone-brasil/"
 repository-code: "https://github.com/irlenmenezes/observatorio-drone-brasil"
 license: MIT

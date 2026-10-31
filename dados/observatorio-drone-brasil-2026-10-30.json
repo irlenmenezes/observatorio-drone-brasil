@@ -3,8 +3,8 @@
   "fonte": "ANAC / SISANT",
   "fonte_url": "https://sistemas.anac.gov.br/dadosabertos/Aeronaves/drones%20cadastrados/SISANT.csv",
   "data_base": "2026-10-30",
-  "processado_em": "2026-10-30T21:37:40",
-  "versao_metodo": "2026.09.2",
+  "processado_em": "2026-10-30T21:51:17",
+  "versao_metodo": "2026.10.1",
   "historico_metodo": [
    {
     "versao": "2026.08.1",
@@ -17,6 +17,10 @@
    {
     "versao": "2026.09.2",
     "mudanca": "comparação entre bases pelo código da aeronave; checagens de consistência antes de publicar; rótulos revisados (aeronaves em nome de CPF, modelos mais cadastrados, UF da sede)"
+   },
+   {
+    "versao": "2026.10.1",
+    "mudanca": "entradas e saídas passam a usar janela fixa de cerca de 30 dias (base atual contra a base de 28 a 32 dias antes), em vez de as duas últimas bases, para que os períodos sejam comparáveis"
    }
   ],
   "registros": 191572,
@@ -32,7 +36,7 @@
    "frota PJ = registros com CNPJ valido",
    "UF: resolvidos + sem resposta = CNPJs",
    "premissa dos 24 meses",
-   "variacao do total contra a edicao anterior (190063) dentro de 15%"
+   "variacao do total contra a edicao anterior (191572) dentro de 15%"
   ],
   "conteudo": "Resultados consolidados e agregados apurados sobre o arquivo SISANT; nao contem os registros individuais. O arquivo bruto esta em fonte_url."
  },

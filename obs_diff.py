@@ -7,8 +7,12 @@ Separa o que a diferenca de totais esconde: primeiro cadastro (codigo que nao ex
 renovacao (mesmo codigo, validade adiantada), saida (codigo que sumiu: vencido, cancelado
 ou transferido) e o saldo liquido. Sem isso, "X mil novos" e so um saldo.
 
-Uso:  python obs_diff.py                     -> compara as duas bases mais recentes
-      python obs_diff.py 2026-08-04 2026-09-20
+Uso:  python obs_diff.py                     -> base mais recente contra a base ~30 dias antes
+      python obs_diff.py 2026-08-04 2026-09-20   (par explicito, para boletins)
+
+Janela padrao fixa (JANELA_ALVO = 30 dias): a referencia e a base mais antiga que caia entre
+28 e 32 dias antes da atual; se nao houver, a mais proxima de 30 dias (sempre anterior) e o
+JSON registra `janela_ajustada`. Assim a comparacao mes a mes tem sempre o mesmo comprimento.
 Grava obs-diff.json (lido pelo obs_build.py) e imprime o resumo.
 """
 import collections
@@ -22,6 +26,8 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 HERE = Path(__file__).parent
 SNAP = HERE / "snapshots"
 SAIDA = HERE / "obs-diff.json"
+JANELA_ALVO = 30
+JANELA_TOLERANCIA = 2
 
 
 def le(caminho):
@@ -55,7 +61,11 @@ def main():
     if len(sys.argv) == 3:
         a, b = (SNAP / f"SISANT_{sys.argv[1]}.csv", SNAP / f"SISANT_{sys.argv[2]}.csv")
     elif len(bases) >= 2:
-        a, b = bases[-2], bases[-1]
+        b = bases[-1]
+        db_ = dt.date.fromisoformat(b.stem.split("_")[1])
+        cand = [x for x in bases[:-1] if x.stem.split("_")[1] < b.stem.split("_")[1]]
+        # a mais proxima de 30 dias antes da base atual (empate: a mais antiga)
+        a = min(cand, key=lambda x: (abs((db_ - dt.date.fromisoformat(x.stem.split("_")[1])).days - JANELA_ALVO), x.stem))
     else:
         print("preciso de duas bases em snapshots/; nada a comparar")
         return 0
@@ -88,6 +98,8 @@ def main():
     pf_novos = sum(1 for c in novos if not B[c][3].upper().startswith("CNPJ"))
     saida = {
         "base_anterior": da, "base_atual": db, "dias": dias,
+        "janela_alvo_dias": JANELA_ALVO,
+        "janela_ajustada": len(sys.argv) != 3 and abs(dias - JANELA_ALVO) > JANELA_TOLERANCIA,
         "linhas_anterior": linhas_a, "linhas_atual": linhas_b,
         "codigos_anterior": len(A), "codigos_atual": len(B),
         "saldo": len(B) - len(A),

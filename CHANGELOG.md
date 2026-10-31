@@ -2,6 +2,9 @@
 
 A versão sobe quando muda uma regra de contagem, normalização ou recorte. Base nova não muda a versão.
 
+## 2026.10.1 (30/10/2026)
+- Entradas e saídas passam a usar janela fixa de cerca de 30 dias: a base atual contra a base arquivada de 28 a 32 dias antes (a mais próxima de 30, se não houver). Antes eram as duas últimas bases, com janelas de 12 a 28 dias que não se comparavam entre edições. A página mostra as datas e o número de dias; o JSON de movimento registra `janela_alvo_dias` e `janela_ajustada`. Seção renomeada para "O que entrou e o que saiu em N dias".
+
 ## 2026.09.2 (21/09/2026)
 - Comparação entre bases pelo `CODIGO_AERONAVE` (`obs_diff.py`): código novo, renovação, saída, recadastro por número de série. Nova seção "O que entrou e o que saiu entre duas bases".
 - Checagens de consistência antes de publicar (10 regras; qualquer falha aborta).
