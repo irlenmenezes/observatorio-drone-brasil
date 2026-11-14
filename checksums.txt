@@ -7,3 +7,13 @@ a1fa621da03496745ee5140b4f8f677839b4f51589daccca028dcdd34642f84a  SISANT_2026-09
 44c589a6e654382c80cb99994b6428f72c4cfb3de158af476a4a6256e17e3c8e  SISANT_2026-10-01.csv
 402d6417022c272958a56063d4de11216bd91c882d798362605363bc8bf24b9a  SISANT_2026-10-18.csv
 44c60a20ddce82139e93982c8a5983083f0b17d96c5dc1c910e91fcd186f54b5  SISANT_2026-10-30.csv
+e696168e813bbbdf5a90bc08759e5ad03dca860d1e42b063c09b498bac3509e8  SISANT_2026-11-01.csv
+26a3175e470fd18c54bf14ef0fd1630397aa7c99ba8e873eb49ef154be32c39a  SISANT_2026-11-12.csv
+a72a860f5b8d0d0b5c31eb751c184f8b1c61fe4b2420b25e562cc241fc8c2ec2  SISANT_2026-11-13.csv
+6545e216efafcf09b7bae0f8360770bfd82ac1e0c2fc39cd7b73c0f6e93dff8e  SISANT_2026-11-14.csv
+
+# SHA-256 do CSV de registro de aviação agrícola do MAPA (SIPEAGRO) usado na seção Agro.
+# O nome traz a data em que foi baixado. O arquivo tem e-mail, telefone e nome de pessoa física,
+# por isso não é redistribuído aqui. Fonte: https://dados.agricultura.gov.br/dataset/sipeagro
+
+8519967ba05a1e7037cf132062a75277a831750ced28a9677cddeabc217b5455  sipeagro_registro_2026-11-14.csv

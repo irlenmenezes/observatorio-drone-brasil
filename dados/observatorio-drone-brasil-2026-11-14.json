@@ -1,0 +1,1615 @@
+{
+ "meta": {
+  "fonte": "ANAC / SISANT",
+  "fonte_url": "https://sistemas.anac.gov.br/dadosabertos/Aeronaves/drones%20cadastrados/SISANT.csv",
+  "data_base": "2026-11-14",
+  "processado_em": "2026-11-14T17:23:29",
+  "versao_metodo": "2026.10.1",
+  "historico_metodo": [
+   {
+    "versao": "2026.08.1",
+    "mudanca": "primeira apuração pública: série por validade menos 24 meses, UF via Receita, ramos agrupados"
+   },
+   {
+    "versao": "2026.09.1",
+    "mudanca": "snapshot por base; modelos colapsados por família; códigos de modelo decifrados pela própria base"
+   },
+   {
+    "versao": "2026.09.2",
+    "mudanca": "comparação entre bases pelo código da aeronave; checagens de consistência antes de publicar; rótulos revisados (aeronaves em nome de CPF, modelos mais cadastrados, UF da sede)"
+   },
+   {
+    "versao": "2026.10.1",
+    "mudanca": "entradas e saídas passam a usar janela fixa de cerca de 30 dias (base atual contra a base de 28 a 32 dias antes), em vez de as duas últimas bases, para que os períodos sejam comparáveis"
+   }
+  ],
+  "registros": 193411,
+  "validade_meses": 24,
+  "licenca": "CC BY 4.0",
+  "checagens": [
+   "PF + PJ = total",
+   "faixas de peso somam o total",
+   "prefixos de matricula somam o total",
+   "ramos agrupados somam o total",
+   "serie + descartados = total",
+   "vencimentos futuros + vencidos = total",
+   "frota PJ = registros com CNPJ valido",
+   "UF: resolvidos + sem resposta = CNPJs",
+   "premissa dos 24 meses",
+   "variacao do total contra a edicao anterior (193333) dentro de 15%"
+  ],
+  "conteudo": "Resultados consolidados e agregados apurados sobre o arquivo SISANT; nao contem os registros individuais. O arquivo bruto esta em fonte_url."
+ },
+ "resumo": {
+  "total": 193411,
+  "pf": 149047,
+  "pj": 44364,
+  "cnpjs": 12032,
+  "vencidos": 110,
+  "frota_pj": 44364
+ },
+ "serie": [
+  {
+   "mes": "2024-11",
+   "novos": 2172,
+   "acumulado": 2172
+  },
+  {
+   "mes": "2024-12",
+   "novos": 3898,
+   "acumulado": 6070
+  },
+  {
+   "mes": "2025-01",
+   "novos": 4553,
+   "acumulado": 10623
+  },
+  {
+   "mes": "2025-02",
+   "novos": 4643,
+   "acumulado": 15266
+  },
+  {
+   "mes": "2025-03",
+   "novos": 4959,
+   "acumulado": 20225
+  },
+  {
+   "mes": "2025-04",
+   "novos": 5244,
+   "acumulado": 25469
+  },
+  {
+   "mes": "2025-05",
+   "novos": 5299,
+   "acumulado": 30768
+  },
+  {
+   "mes": "2025-06",
+   "novos": 5230,
+   "acumulado": 35998
+  },
+  {
+   "mes": "2025-07",
+   "novos": 6311,
+   "acumulado": 42309
+  },
+  {
+   "mes": "2025-08",
+   "novos": 6424,
+   "acumulado": 48733
+  },
+  {
+   "mes": "2025-09",
+   "novos": 7708,
+   "acumulado": 56441
+  },
+  {
+   "mes": "2025-10",
+   "novos": 7976,
+   "acumulado": 64417
+  },
+  {
+   "mes": "2025-11",
+   "novos": 7779,
+   "acumulado": 72196
+  },
+  {
+   "mes": "2025-12",
+   "novos": 6165,
+   "acumulado": 78361
+  },
+  {
+   "mes": "2026-01",
+   "novos": 7300,
+   "acumulado": 85661
+  },
+  {
+   "mes": "2026-02",
+   "novos": 7067,
+   "acumulado": 92728
+  },
+  {
+   "mes": "2026-03",
+   "novos": 9371,
+   "acumulado": 102099
+  },
+  {
+   "mes": "2026-04",
+   "novos": 11399,
+   "acumulado": 113498
+  },
+  {
+   "mes": "2026-05",
+   "novos": 11881,
+   "acumulado": 125379
+  },
+  {
+   "mes": "2026-06",
+   "novos": 13711,
+   "acumulado": 139090
+  },
+  {
+   "mes": "2026-07",
+   "novos": 16626,
+   "acumulado": 155716
+  },
+  {
+   "mes": "2026-08",
+   "novos": 12407,
+   "acumulado": 168123
+  },
+  {
+   "mes": "2026-09",
+   "novos": 10806,
+   "acumulado": 178929
+  },
+  {
+   "mes": "2026-10",
+   "novos": 9913,
+   "acumulado": 188842
+  },
+  {
+   "mes": "2026-11",
+   "novos": 4464,
+   "acumulado": 193306,
+   "parcial": true,
+   "dias": 14
+  }
+ ],
+ "serie_nota": {
+  "inicio": "2024-11",
+  "descartados": 105,
+  "explicacao": "A serie cobre so a janela de 24 meses porque o arquivo da ANAC lista apenas cadastro vigente. Cada barra conta emissoes do mes, somando primeiro cadastro e renovacao."
+ },
+ "vencimentos": [
+  {
+   "mes": "2026-11",
+   "qtd": 2167
+  },
+  {
+   "mes": "2026-12",
+   "qtd": 3898
+  },
+  {
+   "mes": "2027-01",
+   "qtd": 4553
+  },
+  {
+   "mes": "2027-02",
+   "qtd": 4643
+  },
+  {
+   "mes": "2027-03",
+   "qtd": 4959
+  },
+  {
+   "mes": "2027-04",
+   "qtd": 5244
+  },
+  {
+   "mes": "2027-05",
+   "qtd": 5299
+  },
+  {
+   "mes": "2027-06",
+   "qtd": 5230
+  },
+  {
+   "mes": "2027-07",
+   "qtd": 6311
+  },
+  {
+   "mes": "2027-08",
+   "qtd": 6424
+  },
+  {
+   "mes": "2027-09",
+   "qtd": 7708
+  },
+  {
+   "mes": "2027-10",
+   "qtd": 7976
+  },
+  {
+   "mes": "2027-11",
+   "qtd": 7779
+  },
+  {
+   "mes": "2027-12",
+   "qtd": 6165
+  },
+  {
+   "mes": "2028-01",
+   "qtd": 7300
+  },
+  {
+   "mes": "2028-02",
+   "qtd": 7067
+  },
+  {
+   "mes": "2028-03",
+   "qtd": 9371
+  },
+  {
+   "mes": "2028-04",
+   "qtd": 11399
+  },
+  {
+   "mes": "2028-05",
+   "qtd": 11881
+  },
+  {
+   "mes": "2028-06",
+   "qtd": 13711
+  },
+  {
+   "mes": "2028-07",
+   "qtd": 16626
+  },
+  {
+   "mes": "2028-08",
+   "qtd": 12407
+  },
+  {
+   "mes": "2028-09",
+   "qtd": 10806
+  },
+  {
+   "mes": "2028-10",
+   "qtd": 9913
+  },
+  {
+   "mes": "2028-11",
+   "qtd": 4464
+  }
+ ],
+ "uso": {
+  "prefixo": {
+   "PS": 970,
+   "PR": 76476,
+   "PP": 115965
+  },
+  "tipo": {
+   "Avançado": 970,
+   "Básico": 192441
+  }
+ },
+ "ramos": {
+  "Recreativo": 77196,
+  "Cinema e fotografia": 47423,
+  "Agricola / pulverizacao": 14358,
+  "Aerolevantamento e topografia": 9914,
+  "Show de luzes e publicidade": 9660,
+  "Seguranca publica e defesa civil": 8832,
+  "Inspecao tecnica": 8205,
+  "Outros": 7289,
+  "Nao informado": 3704,
+  "Fiscalizacao e orgaos estatais": 2714,
+  "Treinamento": 2556,
+  "Experimental": 772,
+  "Reportagem": 667,
+  "Transporte de carga": 121
+ },
+ "modelos": [
+  {
+   "modelo": "MINI 3",
+   "qtd": 19788
+  },
+  {
+   "modelo": "MINI 4 PRO",
+   "qtd": 14241
+  },
+  {
+   "modelo": "MINI 2",
+   "qtd": 9584
+  },
+  {
+   "modelo": "MINI 5 PRO",
+   "qtd": 7993
+  },
+  {
+   "modelo": "NEO 2",
+   "qtd": 7678
+  },
+  {
+   "modelo": "NEO",
+   "qtd": 6842
+  },
+  {
+   "modelo": "MINI 3 PRO",
+   "qtd": 6601
+  },
+  {
+   "modelo": "MAVIC 3",
+   "qtd": 6181
+  },
+  {
+   "modelo": "AIR 2S",
+   "qtd": 5643
+  },
+  {
+   "modelo": "MATRICE",
+   "qtd": 5399
+  },
+  {
+   "modelo": "MAVIC 2",
+   "qtd": 3847
+  },
+  {
+   "modelo": "AVATA 2",
+   "qtd": 3661
+  },
+  {
+   "modelo": "AIR 3S",
+   "qtd": 3617
+  },
+  {
+   "modelo": "AGRAS",
+   "qtd": 3483
+  },
+  {
+   "modelo": "AVATA",
+   "qtd": 3407
+  },
+  {
+   "modelo": "MAVIC PRO",
+   "qtd": 3359
+  },
+  {
+   "modelo": "PHANTOM 4",
+   "qtd": 3343
+  },
+  {
+   "modelo": "LITO X1",
+   "qtd": 3267
+  },
+  {
+   "modelo": "MINI 4K",
+   "qtd": 3101
+  },
+  {
+   "modelo": "MAVIC",
+   "qtd": 2987
+  },
+  {
+   "modelo": "MAVIC AIR 2",
+   "qtd": 2966
+  },
+  {
+   "modelo": "MINI",
+   "qtd": 2903
+  },
+  {
+   "modelo": "AIR 3",
+   "qtd": 2851
+  },
+  {
+   "modelo": "FLIP",
+   "qtd": 2832
+  },
+  {
+   "modelo": "STAR V3 1",
+   "qtd": 2081
+  },
+  {
+   "modelo": "AGRAS T40",
+   "qtd": 2012
+  },
+  {
+   "modelo": "DMD V3",
+   "qtd": 1953
+  },
+  {
+   "modelo": "AGRAS T25",
+   "qtd": 1892
+  },
+  {
+   "modelo": "AGRAS T50",
+   "qtd": 1884
+  },
+  {
+   "modelo": "MINI SE",
+   "qtd": 1699
+  }
+ ],
+ "fabricantes": [
+  {
+   "marca": "DJI",
+   "qtd": 165319
+  },
+  {
+   "marca": "Xiaomi / FIMI",
+   "qtd": 4636
+  },
+  {
+   "marca": "Damoda",
+   "qtd": 3059
+  },
+  {
+   "marca": "Nova Sky Stories",
+   "qtd": 2031
+  },
+  {
+   "marca": "SMD Baltic",
+   "qtd": 1600
+  },
+  {
+   "marca": "XAG",
+   "qtd": 1301
+  },
+  {
+   "marca": "Outro",
+   "qtd": 1173
+  },
+  {
+   "marca": "Lyzrc",
+   "qtd": 959
+  },
+  {
+   "marca": "Shanghai",
+   "qtd": 656
+  },
+  {
+   "marca": "SJRC",
+   "qtd": 589
+  },
+  {
+   "marca": "Genai",
+   "qtd": 480
+  },
+  {
+   "marca": "Fabricacao",
+   "qtd": 437
+  }
+ ],
+ "peso": {
+  "250 g a 2 kg": 121672,
+  "2 a 25 kg": 8797,
+  "Ate 250 g": 48159,
+  "Acima de 25 kg": 14783
+ },
+ "concentracao": [
+  {
+   "top": 50,
+   "aeronaves": 14646,
+   "share": 0.3301
+  },
+  {
+   "top": 100,
+   "aeronaves": 17039,
+   "share": 0.3841
+  },
+  {
+   "top": 250,
+   "aeronaves": 21048,
+   "share": 0.4744
+  },
+  {
+   "top": 500,
+   "aeronaves": 24200,
+   "share": 0.5455
+  },
+  {
+   "top": 1000,
+   "aeronaves": 27480,
+   "share": 0.6194
+  },
+  {
+   "top": 2000,
+   "aeronaves": 31231,
+   "share": 0.704
+  },
+  {
+   "top": 4000,
+   "aeronaves": 35727,
+   "share": 0.8053
+  }
+ ],
+ "top_operadores": [
+  {
+   "nome": "GOOD LUCK PARTICIPAÇÕES SOCIETÁRIAS LTDA",
+   "frota": 2312,
+   "ramo": "Aeropublicidade – Exposição de letreiros luminosos",
+   "uf": "PR"
+  },
+  {
+   "nome": "CYBERDRONE",
+   "frota": 1600,
+   "ramo": "Aeropublicidade – Exposição de letreiros luminosos",
+   "uf": "SP"
+  },
+  {
+   "nome": "VISUALFARM",
+   "frota": 1133,
+   "ramo": "Aeropublicidade – Exposição de letreiros luminosos",
+   "uf": "SP"
+  },
+  {
+   "nome": "Nova Sky",
+   "frota": 1053,
+   "ramo": "Aerodemonstração",
+   "uf": "EX"
+  },
+  {
+   "nome": "Nova Sky Stories",
+   "frota": 1030,
+   "ramo": "Aerodemonstração",
+   "uf": "SP"
+  },
+  {
+   "nome": "Magic Drone",
+   "frota": 654,
+   "ramo": "Aeropublicidade – Exposição de letreiros luminosos",
+   "uf": "SP"
+  },
+  {
+   "nome": "TAKE SERVICOS",
+   "frota": 600,
+   "ramo": "Aeropublicidade – Exposição de letreiros luminosos",
+   "uf": "RJ"
+  },
+  {
+   "nome": "POLÍCIA MILITAR DO ESTADO DO PARANÁ",
+   "frota": 473,
+   "ramo": "Segurança Pública e/ou Defesa Civil",
+   "uf": "PR"
+  },
+  {
+   "nome": "PMMG2",
+   "frota": 371,
+   "ramo": "Segurança Pública e/ou Defesa Civil",
+   "uf": "MG"
+  },
+  {
+   "nome": "POLICIA MILITAR",
+   "frota": 360,
+   "ramo": "Segurança Pública e/ou Defesa Civil",
+   "uf": "SP"
+  },
+  {
+   "nome": "POLICIA MILITAR DO ESTADO DE SANTA CATARINA",
+   "frota": 336,
+   "ramo": "Segurança Pública e/ou Defesa Civil",
+   "uf": "SC"
+  },
+  {
+   "nome": "IBAMA/CGFIN - COORDENACAO GERAL DE FINANCAS",
+   "frota": 232,
+   "ramo": "Órgãos de Fiscalização - Entidades Estatais",
+   "uf": "DF"
+  },
+  {
+   "nome": "SUPERINTENDÊNCIA DA POLÍCIA TÉCNICO-CIENTÍFICA",
+   "frota": 212,
+   "ramo": "Segurança Pública e/ou Defesa Civil",
+   "uf": "SP"
+  },
+  {
+   "nome": "XMOBOTS AEROESPACIAL E DEFESA LTDA",
+   "frota": 205,
+   "ramo": "Pulverização e aplicação de outros insumos - Aeroagrícola",
+   "uf": "SP"
+  },
+  {
+   "nome": "CEMIG",
+   "frota": 200,
+   "ramo": "Aeroinspeção",
+   "uf": "MG"
+  },
+  {
+   "nome": "COPEL-DIS",
+   "frota": 197,
+   "ramo": "Aeroinspeção",
+   "uf": "PR"
+  },
+  {
+   "nome": "Secretaria da Receita Federal do Brasil",
+   "frota": 194,
+   "ramo": "Órgãos de Fiscalização - Entidades Estatais",
+   "uf": "DF"
+  },
+  {
+   "nome": "BRIGADA MILITAR",
+   "frota": 176,
+   "ramo": "Segurança Pública e/ou Defesa Civil",
+   "uf": "RS"
+  },
+  {
+   "nome": "POLÍCIA JUDICIÁRIA CIVIL - PJC",
+   "frota": 166,
+   "ramo": "Segurança Pública e/ou Defesa Civil",
+   "uf": "MT"
+  },
+  {
+   "nome": "POLICIA MILITAR DO ESTADO DO ESPIRITO SANTO",
+   "frota": 163,
+   "ramo": "Segurança Pública e/ou Defesa Civil",
+   "uf": "ES"
+  }
+ ],
+ "uf": {
+  "empresas": {
+   "PR": 869,
+   "SP": 2688,
+   "EX": 1,
+   "RJ": 644,
+   "MG": 1536,
+   "SC": 783,
+   "DF": 226,
+   "RS": 697,
+   "MT": 592,
+   "ES": 454,
+   "BA": 500,
+   "MS": 282,
+   "GO": 446,
+   "PB": 93,
+   "PA": 392,
+   "RN": 127,
+   "PE": 302,
+   "RO": 260,
+   "SE": 98,
+   "MA": 232,
+   "PI": 71,
+   "AC": 42,
+   "CE": 203,
+   "RR": 52,
+   "AP": 38,
+   "TO": 149,
+   "AL": 104,
+   "AM": 124
+  },
+  "frota": {
+   "PR": 5134,
+   "SP": 12385,
+   "EX": 1053,
+   "RJ": 2901,
+   "MG": 4941,
+   "SC": 2169,
+   "DF": 1707,
+   "RS": 1867,
+   "MT": 1432,
+   "ES": 1384,
+   "BA": 1372,
+   "MS": 919,
+   "GO": 1066,
+   "PB": 370,
+   "PA": 1041,
+   "RN": 406,
+   "PE": 767,
+   "RO": 582,
+   "SE": 240,
+   "MA": 609,
+   "PI": 187,
+   "AC": 174,
+   "CE": 509,
+   "RR": 157,
+   "AP": 144,
+   "TO": 369,
+   "AL": 211,
+   "AM": 237
+  },
+  "frota_sem_enxame": {
+   "PR": 2821,
+   "MG": 4839,
+   "SP": 7914,
+   "SC": 2145,
+   "DF": 1707,
+   "RS": 1865,
+   "MT": 1432,
+   "ES": 1382,
+   "BA": 1369,
+   "RJ": 2145,
+   "GO": 1066,
+   "PB": 370,
+   "PA": 1041,
+   "RN": 406,
+   "MS": 771,
+   "PE": 767,
+   "RO": 582,
+   "SE": 240,
+   "MA": 609,
+   "PI": 187,
+   "AC": 174,
+   "CE": 508,
+   "RR": 157,
+   "AP": 144,
+   "TO": 368,
+   "AL": 211,
+   "AM": 236
+  },
+  "municipios": {
+   "Sao Paulo/SP": 706,
+   "Rio De Janeiro/RJ": 360,
+   "Belo Horizonte/MG": 339,
+   "Curitiba/PR": 237,
+   "Brasilia/DF": 226,
+   "Porto Alegre/RS": 158,
+   "Salvador/BA": 155,
+   "Goiania/GO": 137,
+   "Recife/PE": 130,
+   "Fortaleza/CE": 112,
+   "Campo Grande/MS": 107,
+   "Manaus/AM": 104,
+   "Cuiaba/MT": 100,
+   "Florianopolis/SC": 97,
+   "Campinas/SP": 89,
+   "Vitoria/ES": 87,
+   "Belem/PA": 78,
+   "Sao Luis/MA": 73,
+   "Sao Jose Dos Campos/SP": 65,
+   "Ribeirao Preto/SP": 65,
+   "Natal/RN": 64,
+   "Aracaju/SE": 63,
+   "Maceio/AL": 62,
+   "Porto Velho/RO": 61,
+   "Uberlandia/MG": 59,
+   "Joao Pessoa/PB": 57,
+   "Piracicaba/SP": 55,
+   "Palmas/TO": 52,
+   "Barueri/SP": 49,
+   "Joinville/SC": 49
+  },
+  "cobertura": {
+   "cnpjs_total": 12032,
+   "cnpjs_com_uf": 12005,
+   "cnpjs_sem_uf": 27,
+   "frota_sem_uf": 31
+  }
+ },
+ "apelidos_decifrados": {
+  "MT2PD": "MINI 2",
+  "DF1A0424": "FLIP",
+  "M1P": "MAVIC PRO",
+  "DA2SUE1": "AIR 2S",
+  "CZ3SCL": "AIR 3S",
+  "MM1A": "SPARK",
+  "M4E": "MATRICE 4E",
+  "L1P": "MAVIC 2 PRO",
+  "U11X": "MAVIC AIR"
+ },
+ "agro": {
+  "meta": {
+   "titulo": "Seção Agro: drones agrícolas na ANAC x registro de aviação agrícola do MAPA x área plantada do IBGE",
+   "base_anac": "2026-11-14",
+   "mapa_arquivo_de": "2026-11-08",
+   "mapa_baixado_em": "2026-11-14",
+   "pam_ano": 2025,
+   "pam_atualizado_ibge": "2026-10-23",
+   "processado_em": "2026-11-14T17:23:41",
+   "versao_metodo_agro": "2026.11.1",
+   "fontes": {
+    "anac": "https://sistemas.anac.gov.br/dadosabertos/Aeronaves/drones%20cadastrados/SISANT.csv",
+    "mapa": "https://dados.agricultura.gov.br/dataset/sipeagro",
+    "ibge_pam": "https://sidra.ibge.gov.br/tabela/5457",
+    "portaria_mapa_298_2021": "https://www.in.gov.br/web/dou/-/portaria-n-298-de-22-de-setembro-de-2021-347221930"
+   },
+   "privacidade": "Só agregados. O arquivo do MAPA traz e-mail, telefone e nome de pessoa física; nada disso é publicado. Contagem por município entre 1 e 2 aparece como faixa.",
+   "corte_minimo_municipio": 3,
+   "checagens": [
+    "CPF + CNPJ = frota agrícola",
+    "ramo + modelo = frota agrícola",
+    "faixas de peso somam a frota",
+    "no MAPA: CPF + CNPJ = total",
+    "CNPJ por UF + sem UF = drones em CNPJ",
+    "operadores PJ + PF = operadores",
+    "situações na ANAC somam os operadores",
+    "arquivo do MAPA com volume plausível (500+ operadores)",
+    "PAM: soma das UFs = Brasil",
+    "frota agrícola dentro de 15% da edição anterior (14617)",
+    "operadores do MAPA dentro de 30% da edição anterior (3033)"
+   ]
+  },
+  "frota_anac": {
+   "vigentes": 193234,
+   "drones_agricolas": 14628,
+   "pelo_ramo": 14352,
+   "pelo_modelo": 276,
+   "em_cpf": 7938,
+   "em_cnpj": 6690,
+   "cnpjs": 3375,
+   "cnpj_sem_uf": 17,
+   "peso": {
+    "25kg_ou_mais": 13418,
+    "de_2_a_25kg": 949,
+    "ate_2kg": 261
+   },
+   "ramo_ate_2kg": 261,
+   "marcas": [
+    {
+     "marca": "DJI",
+     "drones": 12123
+    },
+    {
+     "marca": "XAG",
+     "drones": 1301
+    },
+    {
+     "marca": "Xfly",
+     "drones": 216
+    },
+    {
+     "marca": "Gteex",
+     "drones": 194
+    },
+    {
+     "marca": "Eavision",
+     "drones": 179
+    },
+    {
+     "marca": "Shandong",
+     "drones": 46
+    }
+   ],
+   "agras": 11289
+  },
+  "mapa": {
+   "estabelecimentos": 4096,
+   "ativos": 3831,
+   "cancelados": 265,
+   "ativos_so_aviao": 758,
+   "operadores_drone": 3033,
+   "operadores_pj": 2859,
+   "operadores_pf": 174,
+   "escolas_so_ensino": 38,
+   "operadores_drone_e_aviao": 49,
+   "drones_listados": 6135,
+   "drones_codigo_formato_sisant": 5790,
+   "drones_codigo_sem_formato": 345,
+   "drones_em_mais_de_um_registro": 195,
+   "drones_por_operador_mediana": 1,
+   "drones_por_operador": {
+    "1": 1753,
+    "2 a 3": 912,
+    "4 a 9": 316,
+    "10 ou mais": 52
+   },
+   "operadores_por_situacao_na_anac": {
+    "com_drone_vigente_na_anac": 2429,
+    "so_codigo_sem_formato": 221,
+    "so_numeros_nao_vigentes": 383
+   },
+   "numeros_fora_do_sisant_atual": 1160,
+   "soma_drones_por_uf": 6536
+  },
+  "cruzamento": {
+   "drones_agricolas_com_numero_no_mapa": 4523,
+   "em_cnpj_com_numero_no_mapa": 3916,
+   "em_cpf_com_numero_no_mapa": 607,
+   "pelo_ramo_no_mapa": 4501,
+   "pelo_modelo_no_mapa": 22,
+   "cnpjs_agricolas_com_registro_no_mapa_raiz": 2207,
+   "numeros_mapa_achados_codigo_identico": 360,
+   "numeros_mapa_achados_pelos_9_digitos": 4547,
+   "dono_mesma_raiz_cnpj": 3986,
+   "dono_outro_cnpj": 122
+  },
+  "uf": [
+   {
+    "uf": "MT",
+    "area_plantada_ha": 22803121,
+    "drones_agricolas_anac_cnpj": 715,
+    "cnpjs_agricolas_anac": 394,
+    "drones_cnpj_com_numero_no_mapa": 493,
+    "pct_cnpj_com_numero_no_mapa": 69.0,
+    "operadores_mapa": 394,
+    "drones_listados_mapa": 795,
+    "ha_por_drone_mapa": 28683,
+    "ha_por_drone_anac_cnpj": 31892
+   },
+   {
+    "uf": "PR",
+    "area_plantada_ha": 11496447,
+    "drones_agricolas_anac_cnpj": 406,
+    "cnpjs_agricolas_anac": 227,
+    "drones_cnpj_com_numero_no_mapa": 206,
+    "pct_cnpj_com_numero_no_mapa": 50.7,
+    "operadores_mapa": 247,
+    "drones_listados_mapa": 460,
+    "ha_por_drone_mapa": 24992,
+    "ha_por_drone_anac_cnpj": 28316
+   },
+   {
+    "uf": "RS",
+    "area_plantada_ha": 10734649,
+    "drones_agricolas_anac_cnpj": 317,
+    "cnpjs_agricolas_anac": 207,
+    "drones_cnpj_com_numero_no_mapa": 180,
+    "pct_cnpj_com_numero_no_mapa": 56.8,
+    "operadores_mapa": 220,
+    "drones_listados_mapa": 379,
+    "ha_por_drone_mapa": 28324,
+    "ha_por_drone_anac_cnpj": 33863
+   },
+   {
+    "uf": "GO",
+    "area_plantada_ha": 9445624,
+    "drones_agricolas_anac_cnpj": 323,
+    "cnpjs_agricolas_anac": 168,
+    "drones_cnpj_com_numero_no_mapa": 180,
+    "pct_cnpj_com_numero_no_mapa": 55.7,
+    "operadores_mapa": 114,
+    "drones_listados_mapa": 316,
+    "ha_por_drone_mapa": 29891,
+    "ha_por_drone_anac_cnpj": 29243
+   },
+   {
+    "uf": "SP",
+    "area_plantada_ha": 9210103,
+    "drones_agricolas_anac_cnpj": 1560,
+    "cnpjs_agricolas_anac": 524,
+    "drones_cnpj_com_numero_no_mapa": 887,
+    "pct_cnpj_com_numero_no_mapa": 56.9,
+    "operadores_mapa": 435,
+    "drones_listados_mapa": 1397,
+    "ha_por_drone_mapa": 6593,
+    "ha_por_drone_anac_cnpj": 5904
+   },
+   {
+    "uf": "MS",
+    "area_plantada_ha": 7645139,
+    "drones_agricolas_anac_cnpj": 264,
+    "cnpjs_agricolas_anac": 145,
+    "drones_cnpj_com_numero_no_mapa": 151,
+    "pct_cnpj_com_numero_no_mapa": 57.2,
+    "operadores_mapa": 146,
+    "drones_listados_mapa": 266,
+    "ha_por_drone_mapa": 28741,
+    "ha_por_drone_anac_cnpj": 28959
+   },
+   {
+    "uf": "MG",
+    "area_plantada_ha": 6942269,
+    "drones_agricolas_anac_cnpj": 889,
+    "cnpjs_agricolas_anac": 460,
+    "drones_cnpj_com_numero_no_mapa": 526,
+    "pct_cnpj_com_numero_no_mapa": 59.2,
+    "operadores_mapa": 389,
+    "drones_listados_mapa": 768,
+    "ha_por_drone_mapa": 9039,
+    "ha_por_drone_anac_cnpj": 7809
+   },
+   {
+    "uf": "BA",
+    "area_plantada_ha": 4782260,
+    "drones_agricolas_anac_cnpj": 233,
+    "cnpjs_agricolas_anac": 134,
+    "drones_cnpj_com_numero_no_mapa": 137,
+    "pct_cnpj_com_numero_no_mapa": 58.8,
+    "operadores_mapa": 93,
+    "drones_listados_mapa": 196,
+    "ha_por_drone_mapa": 24399,
+    "ha_por_drone_anac_cnpj": 20525
+   },
+   {
+    "uf": "PA",
+    "area_plantada_ha": 3372577,
+    "drones_agricolas_anac_cnpj": 270,
+    "cnpjs_agricolas_anac": 161,
+    "drones_cnpj_com_numero_no_mapa": 128,
+    "pct_cnpj_com_numero_no_mapa": 47.4,
+    "operadores_mapa": 107,
+    "drones_listados_mapa": 198,
+    "ha_por_drone_mapa": 17033,
+    "ha_por_drone_anac_cnpj": 12491
+   },
+   {
+    "uf": "TO",
+    "area_plantada_ha": 2421258,
+    "drones_agricolas_anac_cnpj": 152,
+    "cnpjs_agricolas_anac": 80,
+    "drones_cnpj_com_numero_no_mapa": 89,
+    "pct_cnpj_com_numero_no_mapa": 58.6,
+    "operadores_mapa": 68,
+    "drones_listados_mapa": 147,
+    "ha_por_drone_mapa": 16471,
+    "ha_por_drone_anac_cnpj": 15929
+   },
+   {
+    "uf": "MA",
+    "area_plantada_ha": 2192293,
+    "drones_agricolas_anac_cnpj": 278,
+    "cnpjs_agricolas_anac": 128,
+    "drones_cnpj_com_numero_no_mapa": 191,
+    "pct_cnpj_com_numero_no_mapa": 68.7,
+    "operadores_mapa": 112,
+    "drones_listados_mapa": 269,
+    "ha_por_drone_mapa": 8150,
+    "ha_por_drone_anac_cnpj": 7886
+   },
+   {
+    "uf": "PI",
+    "area_plantada_ha": 2011686,
+    "drones_agricolas_anac_cnpj": 21,
+    "cnpjs_agricolas_anac": 16,
+    "drones_cnpj_com_numero_no_mapa": 5,
+    "pct_cnpj_com_numero_no_mapa": 23.8,
+    "operadores_mapa": 8,
+    "drones_listados_mapa": 30,
+    "ha_por_drone_mapa": 67056,
+    "ha_por_drone_anac_cnpj": 95795
+   },
+   {
+    "uf": "SC",
+    "area_plantada_ha": 1664152,
+    "drones_agricolas_anac_cnpj": 229,
+    "cnpjs_agricolas_anac": 137,
+    "drones_cnpj_com_numero_no_mapa": 134,
+    "pct_cnpj_com_numero_no_mapa": 58.5,
+    "operadores_mapa": 174,
+    "drones_listados_mapa": 288,
+    "ha_por_drone_mapa": 5778,
+    "ha_por_drone_anac_cnpj": 7267
+   },
+   {
+    "uf": "CE",
+    "area_plantada_ha": 1470114,
+    "drones_agricolas_anac_cnpj": 34,
+    "cnpjs_agricolas_anac": 22,
+    "drones_cnpj_com_numero_no_mapa": 18,
+    "pct_cnpj_com_numero_no_mapa": 52.9,
+    "operadores_mapa": 26,
+    "drones_listados_mapa": 49,
+    "ha_por_drone_mapa": 30002,
+    "ha_por_drone_anac_cnpj": 43239
+   },
+   {
+    "uf": "RO",
+    "area_plantada_ha": 1340333,
+    "drones_agricolas_anac_cnpj": 275,
+    "cnpjs_agricolas_anac": 179,
+    "drones_cnpj_com_numero_no_mapa": 156,
+    "pct_cnpj_com_numero_no_mapa": 56.7,
+    "operadores_mapa": 145,
+    "drones_listados_mapa": 241,
+    "ha_por_drone_mapa": 5562,
+    "ha_por_drone_anac_cnpj": 4874
+   },
+   {
+    "uf": "PE",
+    "area_plantada_ha": 796799,
+    "drones_agricolas_anac_cnpj": 91,
+    "cnpjs_agricolas_anac": 34,
+    "drones_cnpj_com_numero_no_mapa": 50,
+    "pct_cnpj_com_numero_no_mapa": 54.9,
+    "operadores_mapa": 28,
+    "drones_listados_mapa": 71,
+    "ha_por_drone_mapa": 11223,
+    "ha_por_drone_anac_cnpj": 8756
+   },
+   {
+    "uf": "ES",
+    "area_plantada_ha": 635181,
+    "drones_agricolas_anac_cnpj": 342,
+    "cnpjs_agricolas_anac": 199,
+    "drones_cnpj_com_numero_no_mapa": 247,
+    "pct_cnpj_com_numero_no_mapa": 72.2,
+    "operadores_mapa": 209,
+    "drones_listados_mapa": 430,
+    "ha_por_drone_mapa": 1477,
+    "ha_por_drone_anac_cnpj": 1857
+   },
+   {
+    "uf": "AL",
+    "area_plantada_ha": 469883,
+    "drones_agricolas_anac_cnpj": 59,
+    "cnpjs_agricolas_anac": 33,
+    "drones_cnpj_com_numero_no_mapa": 35,
+    "pct_cnpj_com_numero_no_mapa": 59.3,
+    "operadores_mapa": 24,
+    "drones_listados_mapa": 49,
+    "ha_por_drone_mapa": 9589,
+    "ha_por_drone_anac_cnpj": 7964
+   },
+   {
+    "uf": "RN",
+    "area_plantada_ha": 399071,
+    "drones_agricolas_anac_cnpj": 22,
+    "cnpjs_agricolas_anac": 8,
+    "drones_cnpj_com_numero_no_mapa": 8,
+    "pct_cnpj_com_numero_no_mapa": 36.4,
+    "operadores_mapa": 9,
+    "drones_listados_mapa": 33,
+    "ha_por_drone_mapa": 12093,
+    "ha_por_drone_anac_cnpj": 18140
+   },
+   {
+    "uf": "PB",
+    "area_plantada_ha": 382550,
+    "drones_agricolas_anac_cnpj": 14,
+    "cnpjs_agricolas_anac": 8,
+    "drones_cnpj_com_numero_no_mapa": 6,
+    "pct_cnpj_com_numero_no_mapa": 42.9,
+    "operadores_mapa": 6,
+    "drones_listados_mapa": 20,
+    "ha_por_drone_mapa": 19128,
+    "ha_por_drone_anac_cnpj": 27325
+   },
+   {
+    "uf": "SE",
+    "area_plantada_ha": 316591,
+    "drones_agricolas_anac_cnpj": 29,
+    "cnpjs_agricolas_anac": 17,
+    "drones_cnpj_com_numero_no_mapa": 19,
+    "pct_cnpj_com_numero_no_mapa": 65.5,
+    "operadores_mapa": 18,
+    "drones_listados_mapa": 37,
+    "ha_por_drone_mapa": 8557,
+    "ha_por_drone_anac_cnpj": 10917
+   },
+   {
+    "uf": "DF",
+    "area_plantada_ha": 195802,
+    "drones_agricolas_anac_cnpj": 21,
+    "cnpjs_agricolas_anac": 13,
+    "drones_cnpj_com_numero_no_mapa": 5,
+    "pct_cnpj_com_numero_no_mapa": 23.8,
+    "operadores_mapa": 6,
+    "drones_listados_mapa": 8,
+    "ha_por_drone_mapa": 24475,
+    "ha_por_drone_anac_cnpj": 9324
+   },
+   {
+    "uf": "RR",
+    "area_plantada_ha": 195106,
+    "drones_agricolas_anac_cnpj": 38,
+    "cnpjs_agricolas_anac": 20,
+    "drones_cnpj_com_numero_no_mapa": 27,
+    "pct_cnpj_com_numero_no_mapa": 71.1,
+    "operadores_mapa": 22,
+    "drones_listados_mapa": 43,
+    "ha_por_drone_mapa": 4537,
+    "ha_por_drone_anac_cnpj": 5134
+   },
+   {
+    "uf": "AM",
+    "area_plantada_ha": 164800,
+    "drones_agricolas_anac_cnpj": 15,
+    "cnpjs_agricolas_anac": 10,
+    "drones_cnpj_com_numero_no_mapa": 9,
+    "pct_cnpj_com_numero_no_mapa": 60.0,
+    "operadores_mapa": 6,
+    "drones_listados_mapa": 9,
+    "ha_por_drone_mapa": 18311,
+    "ha_por_drone_anac_cnpj": 10987
+   },
+   {
+    "uf": "RJ",
+    "area_plantada_ha": 130322,
+    "drones_agricolas_anac_cnpj": 26,
+    "cnpjs_agricolas_anac": 21,
+    "drones_cnpj_com_numero_no_mapa": 11,
+    "pct_cnpj_com_numero_no_mapa": 42.3,
+    "operadores_mapa": 15,
+    "drones_listados_mapa": 20,
+    "ha_por_drone_mapa": 6516,
+    "ha_por_drone_anac_cnpj": 5012
+   },
+   {
+    "uf": "AC",
+    "area_plantada_ha": 101236,
+    "drones_agricolas_anac_cnpj": 50,
+    "cnpjs_agricolas_anac": 16,
+    "drones_cnpj_com_numero_no_mapa": 13,
+    "pct_cnpj_com_numero_no_mapa": 26.0,
+    "operadores_mapa": 12,
+    "drones_listados_mapa": 17,
+    "ha_por_drone_mapa": 5955,
+    "ha_por_drone_anac_cnpj": 2025
+   },
+   {
+    "uf": "AP",
+    "area_plantada_ha": 32798,
+    "drones_agricolas_anac_cnpj": 0,
+    "cnpjs_agricolas_anac": 0,
+    "drones_cnpj_com_numero_no_mapa": 0,
+    "pct_cnpj_com_numero_no_mapa": null,
+    "operadores_mapa": 0,
+    "drones_listados_mapa": 0,
+    "ha_por_drone_mapa": null,
+    "ha_por_drone_anac_cnpj": null
+   }
+  ],
+  "municipios": {
+   "area_brasil_ha": 101352164,
+   "municipios_com_operador_mapa": 1287,
+   "top100_sem_operador_mapa": 28,
+   "top300_sem_operador_mapa": 101,
+   "area_top100_ha": 34772280,
+   "area_em_municipios_sem_operador_ha": 45635748,
+   "uf_destaque_sem_operador": {
+    "uf": "MT",
+    "municipios": 142,
+    "sem_operador": 59,
+    "area_sem_operador_ha": 7026800
+   },
+   "sem_operador_por_uf": {
+    "AC": {
+     "municipios": 22,
+     "sem_operador": 15,
+     "area_sem_operador_ha": 67717
+    },
+    "AL": {
+     "municipios": 102,
+     "sem_operador": 88,
+     "area_sem_operador_ha": 318000
+    },
+    "AM": {
+     "municipios": 62,
+     "sem_operador": 60,
+     "area_sem_operador_ha": 158153
+    },
+    "AP": {
+     "municipios": 16,
+     "sem_operador": 16,
+     "area_sem_operador_ha": 32798
+    },
+    "BA": {
+     "municipios": 417,
+     "sem_operador": 374,
+     "area_sem_operador_ha": 2605853
+    },
+    "CE": {
+     "municipios": 184,
+     "sem_operador": 167,
+     "area_sem_operador_ha": 1331516
+    },
+    "DF": {
+     "municipios": 1,
+     "sem_operador": 0,
+     "area_sem_operador_ha": 0
+    },
+    "ES": {
+     "municipios": 78,
+     "sem_operador": 18,
+     "area_sem_operador_ha": 67174
+    },
+    "GO": {
+     "municipios": 246,
+     "sem_operador": 189,
+     "area_sem_operador_ha": 3792364
+    },
+    "MA": {
+     "municipios": 217,
+     "sem_operador": 167,
+     "area_sem_operador_ha": 966961
+    },
+    "MG": {
+     "municipios": 853,
+     "sem_operador": 662,
+     "area_sem_operador_ha": 3014157
+    },
+    "MS": {
+     "municipios": 79,
+     "sem_operador": 42,
+     "area_sem_operador_ha": 2817961
+    },
+    "MT": {
+     "municipios": 142,
+     "sem_operador": 59,
+     "area_sem_operador_ha": 7026800
+    },
+    "PA": {
+     "municipios": 143,
+     "sem_operador": 107,
+     "area_sem_operador_ha": 1511078
+    },
+    "PB": {
+     "municipios": 223,
+     "sem_operador": 219,
+     "area_sem_operador_ha": 373685
+    },
+    "PE": {
+     "municipios": 185,
+     "sem_operador": 167,
+     "area_sem_operador_ha": 639972
+    },
+    "PI": {
+     "municipios": 224,
+     "sem_operador": 218,
+     "area_sem_operador_ha": 1421231
+    },
+    "PR": {
+     "municipios": 399,
+     "sem_operador": 266,
+     "area_sem_operador_ha": 5953012
+    },
+    "RJ": {
+     "municipios": 89,
+     "sem_operador": 77,
+     "area_sem_operador_ha": 85411
+    },
+    "RN": {
+     "municipios": 167,
+     "sem_operador": 162,
+     "area_sem_operador_ha": 343728
+    },
+    "RO": {
+     "municipios": 52,
+     "sem_operador": 17,
+     "area_sem_operador_ha": 442082
+    },
+    "RR": {
+     "municipios": 15,
+     "sem_operador": 10,
+     "area_sem_operador_ha": 35276
+    },
+    "RS": {
+     "municipios": 497,
+     "sem_operador": 372,
+     "area_sem_operador_ha": 5603172
+    },
+    "SC": {
+     "municipios": 295,
+     "sem_operador": 198,
+     "area_sem_operador_ha": 794905
+    },
+    "SE": {
+     "municipios": 75,
+     "sem_operador": 62,
+     "area_sem_operador_ha": 211200
+    },
+    "SP": {
+     "municipios": 642,
+     "sem_operador": 436,
+     "area_sem_operador_ha": 4186090
+    },
+    "TO": {
+     "municipios": 139,
+     "sem_operador": 109,
+     "area_sem_operador_ha": 1835452
+    }
+   },
+   "maiores_sem_operador_mapa": [
+    {
+     "municipio": "Formosa do Rio Preto",
+     "uf": "BA",
+     "area_plantada_ha": 638832,
+     "empresas_drone_agricola_anac_sede": 0
+    },
+    {
+     "municipio": "São Félix do Araguaia",
+     "uf": "MT",
+     "area_plantada_ha": 545274,
+     "empresas_drone_agricola_anac_sede": "1 a 2"
+    },
+    {
+     "municipio": "Sidrolândia",
+     "uf": "MS",
+     "area_plantada_ha": 465373,
+     "empresas_drone_agricola_anac_sede": "1 a 2"
+    },
+    {
+     "municipio": "Nova Ubiratã",
+     "uf": "MT",
+     "area_plantada_ha": 460130,
+     "empresas_drone_agricola_anac_sede": 0
+    },
+    {
+     "municipio": "Ipiranga do Norte",
+     "uf": "MT",
+     "area_plantada_ha": 453339,
+     "empresas_drone_agricola_anac_sede": "1 a 2"
+    },
+    {
+     "municipio": "Campos de Júlio",
+     "uf": "MT",
+     "area_plantada_ha": 419139,
+     "empresas_drone_agricola_anac_sede": "1 a 2"
+    },
+    {
+     "municipio": "Boa Esperança do Norte",
+     "uf": "MT",
+     "area_plantada_ha": 416965,
+     "empresas_drone_agricola_anac_sede": 0
+    },
+    {
+     "municipio": "Nova Maringá",
+     "uf": "MT",
+     "area_plantada_ha": 396370,
+     "empresas_drone_agricola_anac_sede": 0
+    },
+    {
+     "municipio": "Vera",
+     "uf": "MT",
+     "area_plantada_ha": 339672,
+     "empresas_drone_agricola_anac_sede": "1 a 2"
+    },
+    {
+     "municipio": "Feliz Natal",
+     "uf": "MT",
+     "area_plantada_ha": 328930,
+     "empresas_drone_agricola_anac_sede": 0
+    },
+    {
+     "municipio": "Santa Rita do Trivelato",
+     "uf": "MT",
+     "area_plantada_ha": 321253,
+     "empresas_drone_agricola_anac_sede": 0
+    },
+    {
+     "municipio": "Montividiu",
+     "uf": "GO",
+     "area_plantada_ha": 288570,
+     "empresas_drone_agricola_anac_sede": 0
+    },
+    {
+     "municipio": "Uruçuí",
+     "uf": "PI",
+     "area_plantada_ha": 281275,
+     "empresas_drone_agricola_anac_sede": "1 a 2"
+    },
+    {
+     "municipio": "Santa Carmem",
+     "uf": "MT",
+     "area_plantada_ha": 250660,
+     "empresas_drone_agricola_anac_sede": 0
+    },
+    {
+     "municipio": "Santo Antônio do Leste",
+     "uf": "MT",
+     "area_plantada_ha": 238380,
+     "empresas_drone_agricola_anac_sede": "1 a 2"
+    }
+   ],
+   "polos_operadores_mapa": [
+    {
+     "municipio": "Campo Grande",
+     "uf": "MS",
+     "operadores_mapa": 32,
+     "drones_listados_mapa": 46,
+     "area_plantada_ha": 180874
+    },
+    {
+     "municipio": "Uberlândia",
+     "uf": "MG",
+     "operadores_mapa": 26,
+     "drones_listados_mapa": 58,
+     "area_plantada_ha": 131526
+    },
+    {
+     "municipio": "Redenção",
+     "uf": "PA",
+     "operadores_mapa": 20,
+     "drones_listados_mapa": 46,
+     "area_plantada_ha": 28350
+    },
+    {
+     "municipio": "Juína",
+     "uf": "MT",
+     "operadores_mapa": 20,
+     "drones_listados_mapa": 47,
+     "area_plantada_ha": 79965
+    },
+    {
+     "municipio": "Ariquemes",
+     "uf": "RO",
+     "operadores_mapa": 18,
+     "drones_listados_mapa": 31,
+     "area_plantada_ha": 27459
+    },
+    {
+     "municipio": "Ribeirão Preto",
+     "uf": "SP",
+     "operadores_mapa": 18,
+     "drones_listados_mapa": 67,
+     "area_plantada_ha": 39894
+    },
+    {
+     "municipio": "Cuiabá",
+     "uf": "MT",
+     "operadores_mapa": 18,
+     "drones_listados_mapa": 41,
+     "area_plantada_ha": 16231
+    },
+    {
+     "municipio": "Colniza",
+     "uf": "MT",
+     "operadores_mapa": 17,
+     "drones_listados_mapa": 26,
+     "area_plantada_ha": 11855
+    },
+    {
+     "municipio": "Dourados",
+     "uf": "MS",
+     "operadores_mapa": 17,
+     "drones_listados_mapa": 28,
+     "area_plantada_ha": 457228
+    },
+    {
+     "municipio": "Imperatriz",
+     "uf": "MA",
+     "operadores_mapa": 16,
+     "drones_listados_mapa": 74,
+     "area_plantada_ha": 281
+    }
+   ],
+   "exemplo_sede": {
+    "municipio": "Imperatriz",
+    "uf": "MA",
+    "operadores_mapa": 16,
+    "area_plantada_ha": 281
+   },
+   "operadores_com_municipio_ibge": 2973
+  },
+  "series": {
+   "anac": [
+    {
+     "base": "2026-08-04",
+     "drones_agricolas": 13292,
+     "em_cpf": 7051
+    },
+    {
+     "base": "2026-09-20",
+     "drones_agricolas": 13874,
+     "em_cpf": 7474
+    },
+    {
+     "base": "2026-10-01",
+     "drones_agricolas": 14058,
+     "em_cpf": 7615
+    },
+    {
+     "base": "2026-10-18",
+     "drones_agricolas": 14263,
+     "em_cpf": 7748
+    },
+    {
+     "base": "2026-10-30",
+     "drones_agricolas": 14488,
+     "em_cpf": 7873
+    },
+    {
+     "base": "2026-11-01",
+     "drones_agricolas": 14484,
+     "em_cpf": 7876
+    },
+    {
+     "base": "2026-11-12",
+     "drones_agricolas": 14624,
+     "em_cpf": 7937
+    },
+    {
+     "base": "2026-11-13",
+     "drones_agricolas": 14617,
+     "em_cpf": 7932
+    },
+    {
+     "base": "2026-11-14",
+     "drones_agricolas": 14628,
+     "em_cpf": 7938
+    }
+   ],
+   "mapa": [
+    {
+     "baixado_em": "2026-11-14",
+     "arquivo_mapa_de": "2026-11-08",
+     "operadores": 3033,
+     "operadores_pj": 2859,
+     "operadores_pf": 174,
+     "drones_listados": 6135
+    }
+   ]
+  }
+ }
+}

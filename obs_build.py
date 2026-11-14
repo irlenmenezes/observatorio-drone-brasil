@@ -32,6 +32,14 @@ DIFF_ARQ = BASE / "obs-diff.json"
 DIFF = json.loads(DIFF_ARQ.read_text(encoding="utf-8")) if DIFF_ARQ.exists() else None
 if DIFF and DIFF.get("base_atual") != META["data_base"]:
     DIFF = None  # diff velho nao pode descrever base nova
+# Secao Agro (obs_agro.py, 14/11/2026): opcional. So entra com obs-agro.json da MESMA base ANAC
+# da pagina; OBS_SEM_AGRO=1 (a rotina liga quando o download do MAPA falha) tira a secao.
+AGRO_ARQ = BASE / "obs-agro.json"
+AGRO = None
+if AGRO_ARQ.exists() and not os.environ.get("OBS_SEM_AGRO"):
+    AGRO = json.loads(AGRO_ARQ.read_text(encoding="utf-8"))
+    if AGRO.get("meta", {}).get("base_anac") != META["data_base"]:
+        AGRO = None  # agro de outra base nao descreve esta pagina
 # edicoes anteriores guardadas (obs-drone-AAAA-MM-DD.json), para o arquivo de versoes
 EDICOES = sorted(p.name[10:20] for p in BASE.glob("obs-drone-????-??-??.json")
                  if p.name[10:20] != META["data_base"])
@@ -540,6 +548,19 @@ secoes.append(bloco(
     etiqueta="Frota PJ"
 ))
 
+# ------------------------------------------------------------- secao agro
+AG = None
+if AGRO:
+    try:
+        import obs_agro_html
+        AG = obs_agro_html.monta(AGRO, {"num": num, "pct": pct, "esc": esc, "data_br": data_br,
+                                        "bloco": bloco, "barras_h": barras_h})
+        secoes.extend(AG["secoes"])
+    except Exception as e:  # noqa  a secao agro nunca derruba a pagina
+        print(f"aviso: secao agro fora ({type(e).__name__}: {e})")
+        AG = None
+        AGRO = None
+
 # --------------------------------------------------------------------- HTML
 # O hero traz UMA figura heroica (o total). Os tiles trazem o resto, sem repetir
 # esse numero: dashboard que repete o mesmo valor duas vezes desperdica o topo.
@@ -567,9 +588,10 @@ INDICE = [("crescimento", "Crescimento")] + ([("movimento", "Entradas e saídas"
           ("vencimentos", "Vencimentos"),
           ("estados", "Por estado"), ("modelos", "Modelos"), ("fabricantes", "Fabricantes"),
           ("atividade", "Atividade"), ("uso", "Recreativo x profissional"),
-          ("peso", "Peso"), ("concentracao", "Concentração"), ("metodologia", "Metodologia"),
-          ("dados", "Dados e citação")]
-indice = "".join(f'<a href="#{i}">{t}</a>' for i, t in INDICE)
+          ("peso", "Peso"), ("concentracao", "Concentração")] + (AG["indice"] if AG else []) + [
+          ("perguntas", "Perguntas"), ("metodologia", "Metodologia"), ("dados", "Dados e citação")]
+# o indice fixo do topo leva so a entrada principal de cada grupo; a folha "Explorar" leva todas
+indice = "".join(f'<a href="#{i}">{t}</a>' for i, t in INDICE if not i.startswith("agro-"))
 
 ICO = {
  "topo": '<rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/>',
@@ -601,12 +623,12 @@ dock_html = (
     + '</div></div></div>'
 )
 N_RECORTES = len(secoes)
-POR_EXTENSO = {9: "Nove", 10: "Dez", 11: "Onze", 12: "Doze"}
+POR_EXTENSO = {9: "Nove", 10: "Dez", 11: "Onze", 12: "Doze", 13: "Treze", 14: "Catorze", 15: "Quinze", 16: "Dezesseis"}
 JSON_ATUAL = f"dados/observatorio-drone-brasil-{META['data_base']}.json"
 
-jsonld = json.dumps({
-    "@context": "https://schema.org",
+_ds = ({
     "@type": "Dataset",
+    "@id": CANONICA + "#dataset",
     "name": "Observatório do Drone no Brasil",
     "description": f"Panorama do cadastro de drones no Brasil apurado sobre o arquivo público "
                    f"SISANT da ANAC: {num(T)} aeronaves, evolução mensal, vencimentos, "
@@ -664,13 +686,110 @@ jsonld = json.dumps({
         {"@type": "PropertyValue", "name": "Participação da DJI na frota",
          "value": round(dji["qtd"] / T * 100, 1), "unitText": "%"},
     ],
-}, ensure_ascii=False, indent=1)
+})
 
-titulo = f"Observatório do Drone no Brasil: {num(T)} aeronaves cadastradas"
-descricao = (f"Os números do drone no Brasil apurados direto do arquivo da ANAC: {num(T)} "
-             f"aeronaves cadastradas, {num(RES['cnpjs'])} empresas, crescimento mês a mês, onda de "
-             f"vencimentos, sede das empresas por estado e modelos mais cadastrados. Metodologia "
-             f"aberta e dados consolidados para baixar.")
+_data = data_br(META["data_base"])
+_mes = rotulo_mes(META["data_base"][:7], curto=False)
+_pf, _pj, _emp = RES["pf"], RES["pj"], RES["cnpjs"]
+_agro = next((n for r, n in ramos if r.lower().startswith("agric")), 0)
+UF_NOME = {"SP": "São Paulo", "MG": "Minas Gerais", "PR": "Paraná", "RJ": "Rio de Janeiro", "SC": "Santa Catarina",
+           "RS": "Rio Grande do Sul", "GO": "Goiás", "MT": "Mato Grosso", "BA": "Bahia", "DF": "Distrito Federal",
+           "ES": "Espírito Santo", "PA": "Pará", "MS": "Mato Grosso do Sul", "PE": "Pernambuco", "CE": "Ceará"}
+_u = [(UF_NOME.get(u, u), n) for u, n in uf_emp[:3]]
+_tm = modelos[0]
+if DIFF:
+    _saldo = f"{DIFF['saldo']:+,}".replace(",", ".")
+    _mov = (f"Entre {data_br(DIFF['base_anterior'])} e {data_br(DIFF['base_atual'])} entraram "
+            f"{num(DIFF['codigos_novos'])} códigos novos (cerca de {num(round(DIFF['codigos_novos'] / DIFF['dias']))} por dia) "
+            f"e saíram {num(DIFF['saidas'])}, um saldo de {_saldo} registros.")
+else:
+    _mov = f"O pico foi de {num(pico['novos'])} emissões em {rotulo_mes(pico['mes'])}."
+
+titulo = f"Quantos drones tem no Brasil? {num(T)} cadastrados ({_mes})"
+descricao = (f"O Brasil tem {num(T)} drones cadastrados na ANAC (base de {_data}): {num(_pf)} de pessoas físicas "
+             f"e {num(_pj)} de empresas. Dados por mês, estado, modelo e ramo.")
+
+RESPOSTA = (f"<strong>O Brasil tem {num(T)} drones cadastrados na ANAC</strong>, na base de {_data}. "
+            f"{num(_pf)} estão em nome de pessoa física e {num(_pj)} em nome de {num(_emp)} empresas. "
+            f"{_mov} O número conta só cadastro vigente, então drone sem registro não entra.")
+
+FAQ = [
+    ("Quantos drones tem no Brasil?",
+     f"O Brasil tem {num(T)} drones cadastrados no SISANT, o cadastro da ANAC, na base de {_data}. "
+     f"São {num(_pf)} em nome de pessoa física e {num(_pj)} em nome de {num(_emp)} empresas. "
+     f"Este Observatório recalcula o número todo mês, quando a ANAC publica a base nova."),
+    ("Quantos drones existem no Brasil, contando os que não têm cadastro?",
+     "Não há número oficial para isso. O que existe é o cadastro: aeronaves registradas e com cadastro vigente. "
+     "Drone sem registro não aparece no arquivo da ANAC, e drone já aposentado continua contando até o cadastro vencer. "
+     "Qualquer estimativa maior que o cadastro é cálculo de mercado, não registro."),
+    ("Quantos drones agrícolas e de pulverização tem no Brasil?",
+     f"{num(_agro)} aeronaves do cadastro da ANAC declaram ramo agrícola ou de pulverização, {pct(_agro / T)} da base. "
+     f"O ramo é declarado pelo próprio operador. Números maiores que circulam na imprensa, como 35 mil, "
+     f"são estimativas e não saem do cadastro da ANAC."),
+    ("Quantas empresas têm drone cadastrado no Brasil?",
+     f"{num(_emp)} empresas (CNPJ) têm drone cadastrado, somando {num(_pj)} aeronaves. "
+     f"{_u[0][0]} concentra {num(_u[0][1])} empresas, seguido de {_u[1][0]} ({num(_u[1][1])}) e {_u[2][0]} ({num(_u[2][1])}). "
+     f"O estado vem do CNPJ consultado na Receita Federal, porque o arquivo da ANAC não traz UF."),
+    ("Quantos drones cadastrados são da DJI?",
+     f"{num(dji['qtd'])} aeronaves, {pct(dji['qtd'] / T)} do cadastro. O modelo mais cadastrado é o "
+     f"{_tm['modelo'].title().replace('Dji', 'DJI')} ({num(_tm['qtd'])})."),
+    ("Quantos drones são cadastrados por mês?",
+     f"{_mov} O pico da série foi de {num(pico['novos'])} emissões em {rotulo_mes(pico['mes'])}. "
+     f"Emissão soma primeiro cadastro e renovação."),
+    ("Quantos drones têm até 250 g?",
+     f"{num(sub250)} aeronaves, {pct(sub250 / T)} do cadastro, declaram peso máximo de decolagem de até 250 g. "
+     f"O restante se divide em 250 g a 2 kg ({num(peso['250 g a 2 kg'])}), 2 a 25 kg ({num(peso['2 a 25 kg'])}) "
+     f"e acima de 25 kg ({num(peso['Acima de 25 kg'])})."),
+    ("De onde vêm esses números e com que frequência são atualizados?",
+     "Da contagem direta do arquivo público SISANT, da ANAC, sem estimativa de mercado. "
+     "O script roda de novo a cada base nova, todo mês, confere a consistência antes de publicar e guarda cada edição. "
+     "Os dados consolidados ficam abertos em JSON, com método e código no GitHub."),
+]
+if AG:
+    # mesma regra da secao agro (ramo + modelo de pulverizador, so vigente), para a pagina nao ter dois numeros
+    FAQ[2] = (FAQ[2][0], AG["faq_agro"])
+    FAQ.insert(3, AG["faq_mapa"])
+FAQ_HTML = "".join(f'<div class="q"><h3>{esc(q)}</h3><p>{esc(a)}</p></div>' for q, a in FAQ)
+LEIA = [
+    ("drones-no-brasil-outubro-2026-190-mil-cadastrados-anac-sisant-numeros",
+     "Boletim de outubro: saldo de 4 mil em 28 dias e quem mais cresceu"),
+    ("frota-drones-brasil-serie-historica-2022-2026", "A série histórica de quatro anos de drone no Brasil"),
+    ("quantos-drones-cadastrados-brasil-2026-numeros-sisant", "Quantos drones existem no Brasil: como ler os números do SISANT"),
+    ("cadastro-sisant-vencendo-como-renovar-2026", "Cadastro do SISANT venceu? Como renovar"),
+    ("cadastro-sisant-drone-passo-a-passo-2026", "Como cadastrar o drone no SISANT, passo a passo"),
+]
+LEIA_HTML = ('<div class="leia"><h3>Para entender e usar os números</h3><ul>'
+             + "".join(f'<li><a href="https://irlenmenezes.com.br/{sl}/">{t}</a></li>' for sl, t in LEIA)
+             + '</ul></div>')
+
+_hoje = META["processado_em"][:10]
+_webpage = {
+    "@type": "WebPage", "@id": CANONICA + "#webpage", "url": CANONICA, "name": titulo,
+    "description": descricao, "inLanguage": "pt-BR",
+    "datePublished": "2026-08-05", "dateModified": _hoje,
+    "about": {"@id": CANONICA + "#dataset"}, "mainEntity": {"@id": CANONICA + "#dataset"},
+    "breadcrumb": {"@id": CANONICA + "#breadcrumb"},
+    "isPartOf": {"@type": "WebSite", "name": "Irlen Menezes", "url": "https://irlenmenezes.com.br/"},
+    "author": {"@type": "Person", "name": "Irlen Menezes", "url": "https://irlenmenezes.com.br/sobre/"},
+    "publisher": {"@type": "Person", "name": "Irlen Menezes", "url": "https://irlenmenezes.com.br/"},
+}
+_faq = {"@type": "FAQPage", "@id": CANONICA + "#faq", "inLanguage": "pt-BR",
+        "mainEntity": [{"@type": "Question", "name": q,
+                        "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in FAQ]}
+_crumb = {"@type": "BreadcrumbList", "@id": CANONICA + "#breadcrumb", "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Início", "item": "https://irlenmenezes.com.br/"},
+    {"@type": "ListItem", "position": 2, "name": "Ferramentas", "item": "https://irlenmenezes.com.br/ferramentas/"},
+    {"@type": "ListItem", "position": 3, "name": "Observatório do Drone no Brasil", "item": CANONICA}]}
+_ds["dateModified"] = _hoje
+if AG:
+    _ds["description"] += AG["ds_desc"]
+    _ds["keywords"] = _ds["keywords"] + AG["keywords"]
+    _ds["variableMeasured"] = _ds["variableMeasured"] + AG["ds_vars"]
+    _ds["isBasedOn"] = [_ds["isBasedOn"]] + AG["ds_base"]
+    _ds["measurementTechnique"] += (" Drones agrícolas cruzados com o registro de aviação agrícola do MAPA pelos "
+                                    "9 dígitos do número da aeronave e com a área plantada da PAM/IBGE; só agregados.")
+jsonld = json.dumps({"@context": "https://schema.org", "@graph": [_webpage, _ds, _faq, _crumb]},
+                    ensure_ascii=False, indent=1)
 
 # CSS fora da f-string: chave dupla em folha deste tamanho é fonte garantida de bug.
 # Folha editorial (20/09/2026). A anterior (premium navy/amarelo) esta em obs_build.py.bak-20260920-premium.
@@ -879,6 +998,19 @@ footer p{margin:0 0 6px}
  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 
+/* resposta direta + perguntas (02/11/2026) */
+.resposta{margin:22px 0 0;padding:16px 18px;border-left:4px solid var(--acento);background:var(--sup);
+ border-radius:0 8px 8px 0;font-size:clamp(16px,1.45vw,18px);line-height:1.6;color:var(--ink);max-width:58ch}
+.resposta strong{font-weight:800}
+.faq{display:grid;gap:0;max-width:74ch}
+.faq .q{padding:18px 0;border-top:1px solid var(--fio)}
+.faq .q:first-child{border-top:0;padding-top:0}
+.faq h3{margin:0 0 6px;font-family:var(--serif);font-weight:700;font-size:19px;line-height:1.3;letter-spacing:-.01em}
+.faq p{margin:0;font-size:16.5px;line-height:1.65;color:var(--ink2)}
+.leia{margin-top:30px;padding:18px 20px;border:1px solid var(--borda);border-radius:10px;background:var(--sup);max-width:74ch}
+.leia h3{margin:0 0 10px;font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.leia ul{margin:0;padding-left:18px}
+.leia li{margin:6px 0;font-size:15.5px;line-height:1.5}
 /* ---------------------------------------------------------------- mobile */
 @media(max-width:900px){ .hero-g{grid-template-columns:1fr;gap:26px} .figura{border-left:0;padding-left:0;border-top:1px solid var(--fio);padding-top:22px} .tiles{grid-template-columns:repeat(2,minmax(0,1fr))} .tile:nth-child(2){border-right:0} .tile:nth-child(3){padding-left:0;border-top:1px solid var(--grade)} .tile:nth-child(4){border-top:1px solid var(--grade)} }
 @media(max-width:700px){
@@ -943,6 +1075,8 @@ ESCURO = ("--papel:#0f1317;--sup:#161b20;--sup2:#1d242b;"
           "--o1:#27394a;--o2:#3f6788;--o3:#6aa0cc;--o4:#b5d4ec;"
           "--linkc:#9ccbf0;color-scheme:dark;")
 CSS = CSS.replace("__ESCURO__", ESCURO)
+if AG:
+    CSS += AG["css"]
 
 JS = """<script>
 (function(){var r=document.documentElement,b=document.getElementById("tema");
@@ -982,6 +1116,11 @@ html = f"""<!DOCTYPE html>
 <meta property="og:locale" content="pt_BR">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#f2f4f2">
+<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+<meta name="author" content="Irlen Menezes">
+<meta property="og:site_name" content="Irlen Menezes">
+<meta property="article:modified_time" content="{_hoje}">
+<link rel="alternate" type="application/json" href="observatorio-drone-brasil.json" title="Dados consolidados (JSON)">
 <script type="application/ld+json">{jsonld}</script>
 <style>{CSS}</style>
 </head>
@@ -998,13 +1137,13 @@ html = f"""<!DOCTYPE html>
   <div class="hero-g">
    <div>
     <span class="k">Relatório de cadastro · SISANT</span>
-    <h1>Quantos drones existem no Brasil, contados um a um</h1>
-    <p class="sub">O retrato do cadastro nacional apurado linha a linha sobre o arquivo
-     público da ANAC. {POR_EXTENSO.get(N_RECORTES, N_RECORTES)} recortes, cada um com o método
+    <h1>Quantos drones tem no Brasil?</h1>
+    <p class="resposta" id="resposta">{RESPOSTA}</p>
+    <p class="sub">Contados um a um, linha a linha no arquivo público da ANAC{", e cruzados com o MAPA e o IBGE na parte agro" if AG else ""}. {POR_EXTENSO.get(N_RECORTES, N_RECORTES)} recortes, cada um com o método
      declarado embaixo do gráfico, e os dados consolidados para baixar e conferir.</p>
     <p class="fonte">Fonte primária:
      <a href="https://www.gov.br/anac/pt-br/assuntos/regulados/aeronaves/drones" rel="noopener">SISANT / ANAC</a>,
-     {num(META['registros'])} registros. Localização por estado cruzada com a Receita Federal.</p>
+     {num(META['registros'])} registros. Localização por estado cruzada com a Receita Federal.{AG["fonte"] if AG else ""}</p>
     <p class="fonte autor">Apuração de <a href="https://irlenmenezes.com.br/sobre/" rel="author">Irlen Menezes</a>,
      cientista de dados formado pela PUC Minas, com experiência em legislação e regulação de drones no Brasil.</p>
    </div>
@@ -1028,8 +1167,17 @@ html = f"""<!DOCTYPE html>
 <main class="wrap">
  {"".join(secoes)}
 
- <section id="metodologia" class="sec">
+ <section id="perguntas" class="sec">
   <div class="sec-h"><span class="sec-n">{N_RECORTES + 1:02d}</span><div class="sec-t">
+   <h2>Perguntas frequentes: quantos drones tem no Brasil</h2>
+   <span class="sec-tag">Respostas diretas</span>
+   <p class="chapeu">As respostas saem dos mesmos números da página e mudam junto com a base, todo mês.</p>
+  </div></div>
+  <div class="sec-c"><div class="faq">{FAQ_HTML}</div>{LEIA_HTML}</div>
+ </section>
+
+ <section id="metodologia" class="sec">
+  <div class="sec-h"><span class="sec-n">{N_RECORTES + 2:02d}</span><div class="sec-t">
    <h2>Como estes números foram apurados</h2>
    <span class="sec-tag">Transparência</span>
    <p class="chapeu">Nada aqui vem de estimativa de mercado ou de release. Tudo sai do arquivo
@@ -1073,6 +1221,7 @@ html = f"""<!DOCTYPE html>
     como a janela da série), a premissa dos 24 meses tem de valer e o total não pode variar mais de
     15% contra a edição anterior. Se uma falha, nada sobe. Os números desta página valem para
     {data_br(META['data_base'])}.</li>
+   {AG["metodo_li"] if AG else ""}
    <li><strong>Quem apura.</strong> Irlen Menezes, cientista de dados formado pela PUC Minas, com
     experiência em legislação e regulação de drones no Brasil. Autor do blog de drones de
     <a href="https://irlenmenezes.com.br/">irlenmenezes.com.br</a> e das ferramentas gratuitas para pilotos.</li>
@@ -1081,7 +1230,7 @@ html = f"""<!DOCTYPE html>
  </section>
 
  <section id="dados" class="sec">
-  <div class="sec-h"><span class="sec-n">{N_RECORTES + 2:02d}</span><div class="sec-t">
+  <div class="sec-h"><span class="sec-n">{N_RECORTES + 3:02d}</span><div class="sec-t">
    <h2>Dados, versões e citação</h2>
    <span class="sec-tag">Imprensa e pesquisa</span>
    <p class="chapeu">Os dados consolidados ficam públicos, sem cadastro, e cada edição fica
@@ -1093,6 +1242,7 @@ html = f"""<!DOCTYPE html>
      <h3>Esta edição</h3>
      <dl class="ficha">
       <dt>Base ANAC</dt><dd>{data_br(META['data_base'])} · {num(META['registros'])} registros</dd>
+      {AG["ficha"] if AG else ""}
       <dt>Processada em</dt><dd>{data_br(META['processado_em'][:10])}</dd>
       <dt>Método</dt><dd>versão {META.get('versao_metodo', '—')}</dd>
       <dt>Código</dt><dd><a href="{REPO}" rel="noopener">github.com/irlenmenezes/observatorio-drone-brasil</a>: scripts, edições e checksum dos arquivos da ANAC, para reproduzir a apuração</dd>
@@ -1122,7 +1272,7 @@ Apuração sobre o SISANT. Disponível em: {CANONICA}</code>
 
 <footer>
  <div class="wrap">
-  <p>Apuração independente sobre dados abertos da ANAC ·
+  <p>Apuração independente sobre dados abertos da ANAC{", do MAPA e do IBGE" if AG else ""} ·
    <a href="https://irlenmenezes.com.br/">irlenmenezes.com.br</a></p>
   <p style="margin:8px 0 0;opacity:.72">Base de {data_br(META['data_base'])} ·
    {num(META['registros'])} registros · método {META.get('versao_metodo', '')} · dados consolidados em
@@ -1140,19 +1290,36 @@ html = html.replace('<svg viewBox', '<div class="chw"><svg viewBox').replace('</
 
 DESTINO.mkdir(parents=True, exist_ok=True)
 (DESTINO / "index.html").write_text(html, encoding="utf-8")
-shutil.copy(DADOS, DESTINO / "observatorio-drone-brasil.json")
+# JSON publico: o consolidado do SISANT + o bloco agro (so agregados) quando a secao entrou
+_pub = dict(d)
+if AGRO:
+    _pub["agro"] = AGRO
+(DESTINO / "observatorio-drone-brasil.json").write_text(json.dumps(_pub, ensure_ascii=False, indent=1), encoding="utf-8")
 
 # arquivo de edicoes: uma copia datada por base, mais o diff entre bases, em dados/.
 # A edicao corrente tambem fica guardada localmente como obs-drone-<data>.json.
 (DESTINO / "dados").mkdir(exist_ok=True)
 shutil.copy(DADOS, BASE / f"obs-drone-{META['data_base']}.json")
 for e in sorted(set(EDICOES) | {META["data_base"]}):
-    shutil.copy(BASE / f"obs-drone-{e}.json", DESTINO / "dados" / f"observatorio-drone-brasil-{e}.json")
+    _ag = BASE / f"obs-agro-{e}.json"
+    _dest = DESTINO / "dados" / f"observatorio-drone-brasil-{e}.json"
+    if e == META["data_base"]:
+        _ed = dict(d)
+        if AGRO:
+            _ed["agro"] = AGRO
+        _dest.write_text(json.dumps(_ed, ensure_ascii=False, indent=1), encoding="utf-8")
+    elif _ag.exists():  # edicao antiga que teve secao agro: o arquivo datado guarda as duas partes
+        _ed = json.loads((BASE / f"obs-drone-{e}.json").read_text(encoding="utf-8"))
+        _ed["agro"] = json.loads(_ag.read_text(encoding="utf-8"))
+        _dest.write_text(json.dumps(_ed, ensure_ascii=False, indent=1), encoding="utf-8")
+    else:
+        shutil.copy(BASE / f"obs-drone-{e}.json", _dest)
 if DIFF:
     shutil.copy(DIFF_ARQ, DESTINO / "dados" / f"movimento-{DIFF['base_anterior']}-a-{DIFF['base_atual']}.json")
 
 # fontes locais (20/09/2026)
-shutil.copy(BASE / "obs-irlen-mark.webp", DESTINO / "irlen-mark.webp")
+if (BASE / "obs-irlen-mark.webp").exists():  # marca do autor: fica fora do repositório público
+    shutil.copy(BASE / "obs-irlen-mark.webp", DESTINO / "irlen-mark.webp")
 (DESTINO / "fonts").mkdir(exist_ok=True)
 for f in (BASE / "obs-fonts").glob("*.woff2"):
     shutil.copy(f, DESTINO / "fonts" / f.name)
@@ -1180,7 +1347,12 @@ for v in ("hero-airspace.webm", "hero-airspace.mp4"):
     "ForceType video/webm\n"
     "</FilesMatch>\n", encoding="utf-8", newline="\n")  # LF: no Windows o padrão vira CRLF
 
+(DESTINO / "sitemap.xml").write_text(
+    '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n <url>\n'
+    f'  <loc>{CANONICA}</loc>\n  <lastmod>{META["processado_em"][:10]}</lastmod>\n  <changefreq>monthly</changefreq>\n'
+    '  <priority>0.9</priority>\n </url>\n</urlset>\n', encoding="utf-8", newline="\n")
+
 kb = len(html.encode("utf-8")) / 1024
 print(f"gerado: {DESTINO / 'index.html'}  ({kb:.1f} KB)")
-print(f"secoes: {len(secoes) + 1}   tabelas: {html.count('<table>')}   graficos: {html.count('<svg')}")
+print(f"secoes: {len(secoes) + 1}   tabelas: {html.count('<table')}   graficos: {html.count('<svg')}")
 print(f"json publicado junto: observatorio-drone-brasil.json")

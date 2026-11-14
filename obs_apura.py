@@ -35,7 +35,7 @@ PREFIXOS_ENXAME = ("aeropublicidade", "aerodemonstra")
 # Versao do metodo: sobe quando muda regra de contagem, normalizacao ou recorte
 # (nao quando entra base nova). Cada edicao publicada guarda a versao com que foi
 # apurada, para que um numero citado hoje continue conferivel depois.
-VERSAO_METODO = "2026.10.1"
+VERSAO_METODO = "2026.11.1"
 HISTORICO_METODO = [
     ("2026.08.1", "primeira apuração pública: série por validade menos 24 meses, UF via Receita, ramos agrupados"),
     ("2026.09.1", "snapshot por base; modelos colapsados por família; códigos de modelo decifrados pela própria base"),
@@ -43,6 +43,9 @@ HISTORICO_METODO = [
                   "rótulos revisados (aeronaves em nome de CPF, modelos mais cadastrados, UF da sede)"),
     ("2026.10.1", "entradas e saídas passam a usar janela fixa de cerca de 30 dias (base atual contra a base de "
                   "28 a 32 dias antes), em vez de as duas últimas bases, para que os períodos sejam comparáveis"),
+    ("2026.11.1", "seção Agro: drones agrícolas da ANAC cruzados com o registro de aviação agrícola do MAPA (9 dígitos "
+                  "do número) e com a área plantada do IBGE; município com 1 ou 2 operadores vira faixa; a pergunta "
+                  "sobre drones agrícolas passa a usar a regra da seção (ramo + modelo de pulverizador)"),
 ]
 
 

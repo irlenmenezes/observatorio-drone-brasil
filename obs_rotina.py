@@ -8,8 +8,15 @@ purga o cache e avisa o IndexNow. Grava tudo em obs_rotina.log e um resumo em ob
 Uso manual:  python obs_rotina.py            (respeita a checagem de data)
              python obs_rotina.py --forcar   (reprocessa mesmo sem base nova)
 Agendada no Windows (Task Scheduler): tarefa "Observatorio Drone mensal", dia 1, 09:00, roda se perdeu o horário.
+
+Seção Agro (14/11/2026): a cada execução baixa também o registro de aviação agrícola do MAPA
+(obs_mapa_baixa.py, snapshot em snapshots/mapa/) e, quando a página é regerada, apura o
+cruzamento (obs_agro.py -> obs-agro.json). Se o download ou a apuração agro falhar, a rotina
+segue e publica a página SEM a seção Agro (OBS_SEM_AGRO=1 no build). Antes de publicar, varre
+o que vai subir atrás de e-mail e telefone: o CSV do MAPA tem os dois e nada disso pode sair.
 """
 import datetime as dt
+import re
 import json
 import os
 import shutil
@@ -86,17 +93,53 @@ def data_da_base(caminho):
 
 
 def base_publicada():
+    """Data da BASE ANAC da pagina no ar. Le o "version" do Dataset (= data da base). O
+    "dateModified" virou data de processamento em 02/11 e nao serve mais para isso."""
     try:
         html = urllib.request.urlopen(URL_PAGINA, timeout=30).read().decode("utf-8", "replace")
-        i = html.find('"dateModified": "')
-        return html[i + 17:i + 27] if i >= 0 else None
+        for marca in ('"version": "', '"dateModified": "'):
+            i = html.find(marca)
+            if i >= 0:
+                return html[i + len(marca):i + len(marca) + 10]
+        return None
     except Exception as e:  # noqa
         log(f"aviso: nao li a pagina publicada ({e})")
         return None
 
 
+# o que nunca pode subir: e-mail e telefone (o CSV do MAPA tem os dois)
+PESSOAL = [("e-mail", re.compile(r"[\w.+-]+@[\w-]+\.[a-z]{2,}[\w.-]*", re.I)),
+           ("telefone", re.compile(r"\(\d{2}\)\s*\d{4,5}-?\d{4}"))]
+
+
+def varre_saida():
+    """Problemas de privacidade no que vai ser publicado (vazio = ok)."""
+    probs = []
+    alvos = [SAIDA / "index.html", SAIDA / "observatorio-drone-brasil.json"] + sorted((SAIDA / "dados").glob("*.json"))
+    for arq in alvos:
+        if not arq.exists():
+            continue
+        txt = arq.read_text(encoding="utf-8", errors="replace")
+        for nome, pad in PESSOAL:
+            m = pad.search(txt)
+            if m:
+                probs.append(f"{nome} em {arq.name}: {m.group(0)[:6]}...")
+    return probs
+
+
+def baixa_mapa():
+    """Snapshot do MAPA. Nunca derruba a rotina: devolve True/False."""
+    try:
+        run([sys.executable, str(HERE / "obs_mapa_baixa.py")], timeout=600)
+        return True
+    except Exception as e:  # noqa
+        log(f"aviso: download do MAPA falhou ({e}); a pagina sai sem a secao Agro")
+        return False
+
+
 def main():
     log("=== inicio da rotina ===")
+    mapa_ok = baixa_mapa()   # a cada execucao: o arquivo do MAPA nao tem data, a serie sai dos snapshots
     # 1. baixa a base
     tmp = HERE / "SISANT_baixado.csv"
     urllib.request.urlretrieve(URL_CSV, tmp)
@@ -119,7 +162,27 @@ def main():
     run([py, str(HERE / "consulta_uf.py")])
     out = run([py, str(HERE / "obs_apura.py")])       # aborta sozinho se uma checagem de consistencia falhar
     run([py, str(HERE / "obs_diff.py")])              # entradas, renovacoes e saidas contra o snapshot anterior
-    run([py, str(HERE / "obs_build.py")])
+    agro_ok = False
+    if mapa_ok:
+        try:
+            run([py, str(HERE / "obs_agro.py")], timeout=1800)   # aborta sozinho se checagem ou privacidade falhar
+            agro_ok = True
+        except Exception as e:  # noqa
+            log(f"aviso: apuracao agro falhou ({e}); a pagina sai sem a secao Agro")
+    env_build = dict(os.environ)
+    if not agro_ok:
+        env_build["OBS_SEM_AGRO"] = "1"
+    run([py, str(HERE / "obs_build.py")], env=env_build)
+    probs = varre_saida()
+    if probs and agro_ok:
+        log("PRIVACIDADE: " + "; ".join(probs) + " -> regerando sem a secao Agro")
+        agro_ok = False
+        env_build["OBS_SEM_AGRO"] = "1"
+        run([py, str(HERE / "obs_build.py")], env=env_build)
+        probs = varre_saida()
+    if probs:
+        raise RuntimeError("PRIVACIDADE: dado pessoal no que ia subir, nada publicado: " + "; ".join(probs))
+    log(f"secao agro: {'dentro' if agro_ok else 'fora'} (download MAPA {'ok' if mapa_ok else 'falhou'})")
     idx = SAIDA / "index.html"
     if nova.split("-")[2] + "/" + nova.split("-")[1] + "/" + nova.split("-")[0] not in idx.read_text(encoding="utf-8"):
         raise RuntimeError("a pagina gerada nao traz a data da base nova")
@@ -131,7 +194,9 @@ def main():
         return 0
     # dados/ leva a edicao datada e o diff: cada base publicada fica conferivel depois
     tarcmd = [TAR, "-C", str(SAIDA), "-cf", "-", "index.html", "observatorio-drone-brasil.json", "sitemap.xml", "dados", "irlen-mark.webp"]
-    remoto = (f"set -e; cd {REMOTO} && cp index.html ~/observatorio-index.bak_{nova.replace('-', '')} && tar -xf - "
+    # backup do index anterior; se ja existe um da mesma base (reprocessamento), nao sobrescreve
+    bak = f"~/observatorio-index.bak_{nova.replace('-', '')}"
+    remoto = (f"set -e; cd {REMOTO} && b={bak}; if [ -e $b ]; then b=${{b}}_$(date +%H%M%S); fi; cp index.html $b && tar -xf - "
               f"&& cd .. && wp litespeed-purge all | tail -1")
     log("publicando...")
     p1 = subprocess.Popen(tarcmd, stdout=subprocess.PIPE)
@@ -154,7 +219,8 @@ def main():
         except Exception as e:  # noqa
             code = f"erro {e}"
         log(f"indexnow: {code}")
-    resumo = f"{dt.datetime.now():%d/%m/%Y %H:%M}: publicada a base ANAC de {nova} (antes: {atual}).\n" + (out.strip()[-600:] if out else "")
+    resumo = (f"{dt.datetime.now():%d/%m/%Y %H:%M}: publicada a base ANAC de {nova} (antes: {atual}). "
+              f"Secao agro: {'dentro' if agro_ok else 'FORA'} (download MAPA {'ok' if mapa_ok else 'falhou'}).\n") + (out.strip()[-600:] if out else "")
     RESUMO.write_text(resumo + "\n", encoding="utf-8")
     log("=== fim: OK ===")
     return 0

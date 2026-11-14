@@ -2,13 +2,18 @@
 obs_rotina.env
 *.env
 
-# arquivos brutos da ANAC (públicos na fonte; não redistribuídos aqui) e derivados locais
+# arquivos brutos da ANAC e do MAPA (públicos na fonte; não redistribuídos aqui) e derivados locais.
+# O CSV do MAPA tem e-mail, telefone e nome de pessoa física: nenhum CSV entra no repositório.
+*.csv
 SISANT*.csv
+sipeagro*
 snapshots/
 cnpjs-frota.json
 obs-drone.json
 obs-drone.json.bak*
 obs-diff.json
+obs-agro.json
+obs-agro-*.json
 
 # saída gerada
 site/
