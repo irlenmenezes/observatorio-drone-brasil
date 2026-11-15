@@ -630,6 +630,7 @@ _ds = ({
     "@type": "Dataset",
     "@id": CANONICA + "#dataset",
     "name": "Observatório do Drone no Brasil",
+    "alternateName": ["Observatório do Drone", "Observatório de Drones do Brasil", "Observatório de drones"],
     "description": f"Panorama do cadastro de drones no Brasil apurado sobre o arquivo público "
                    f"SISANT da ANAC: {num(T)} aeronaves, evolução mensal, vencimentos, "
                    f"distribuição por estado, modelos, fabricantes e ramo de atividade. "
@@ -705,7 +706,10 @@ if DIFF:
 else:
     _mov = f"O pico foi de {num(pico['novos'])} emissões em {rotulo_mes(pico['mes'])}."
 
-titulo = f"Quantos drones tem no Brasil? {num(T)} cadastrados ({_mes})"
+titulo = f"Quantos drones tem no Brasil? {num(T)} cadastrados | Observatório do Drone"
+# 15/11/2026: o nome do projeto nao aparecia em title/H1/og, e a pagina nao saia nem na busca
+# pelo proprio nome. A marca vai no fim do title e na frente do og:title (compartilhamento).
+og_titulo = f"Observatório do Drone no Brasil: {num(T)} drones cadastrados ({_mes})"
 descricao = (f"O Brasil tem {num(T)} drones cadastrados na ANAC (base de {_data}): {num(_pf)} de pessoas físicas "
              f"e {num(_pj)} de empresas. Dados por mês, estado, modelo e ramo.")
 
@@ -740,6 +744,10 @@ FAQ = [
      f"{num(sub250)} aeronaves, {pct(sub250 / T)} do cadastro, declaram peso máximo de decolagem de até 250 g. "
      f"O restante se divide em 250 g a 2 kg ({num(peso['250 g a 2 kg'])}), 2 a 25 kg ({num(peso['2 a 25 kg'])}) "
      f"e acima de 25 kg ({num(peso['Acima de 25 kg'])})."),
+    ("O que é o Observatório do Drone no Brasil?",
+     "É um observatório de dados abertos sobre drones no Brasil, mantido por Irlen Menezes. Todo mês ele conta o "
+     "cadastro de drones da ANAC (SISANT), cruza a frota agrícola com o registro do MAPA e a área plantada do IBGE "
+     "e publica os números com método, dados em JSON e código aberto no GitHub. Não é um órgão do governo."),
     ("De onde vêm esses números e com que frequência são atualizados?",
      "Da contagem direta do arquivo público SISANT, da ANAC, sem estimativa de mercado. "
      "O script roda de novo a cada base nova, todo mês, confere a consistência antes de publicar e guarda cada edição. "
@@ -1110,7 +1118,7 @@ html = f"""<!DOCTYPE html>
 <meta name="description" content="{esc(descricao)}">
 <link rel="canonical" href="{CANONICA}">
 <meta property="og:type" content="website">
-<meta property="og:title" content="{esc(titulo)}">
+<meta property="og:title" content="{esc(og_titulo)}">
 <meta property="og:description" content="{esc(descricao)}">
 <meta property="og:url" content="{CANONICA}">
 <meta property="og:locale" content="pt_BR">
@@ -1139,7 +1147,7 @@ html = f"""<!DOCTYPE html>
     <span class="k">Relatório de cadastro · SISANT</span>
     <h1>Quantos drones tem no Brasil?</h1>
     <p class="resposta" id="resposta">{RESPOSTA}</p>
-    <p class="sub">Contados um a um, linha a linha no arquivo público da ANAC{", e cruzados com o MAPA e o IBGE na parte agro" if AG else ""}. {POR_EXTENSO.get(N_RECORTES, N_RECORTES)} recortes, cada um com o método
+    <p class="sub">O Observatório do Drone no Brasil conta cada aeronave, linha a linha, no arquivo público da ANAC{", e cruza a parte agro com o MAPA e o IBGE" if AG else ""}. {POR_EXTENSO.get(N_RECORTES, N_RECORTES)} recortes, cada um com o método
      declarado embaixo do gráfico, e os dados consolidados para baixar e conferir.</p>
     <p class="fonte">Fonte primária:
      <a href="https://www.gov.br/anac/pt-br/assuntos/regulados/aeronaves/drones" rel="noopener">SISANT / ANAC</a>,
