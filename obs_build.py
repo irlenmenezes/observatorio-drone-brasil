@@ -706,7 +706,9 @@ if DIFF:
 else:
     _mov = f"O pico foi de {num(pico['novos'])} emissões em {rotulo_mes(pico['mes'])}."
 
-titulo = f"Quantos drones tem no Brasil? {num(T)} cadastrados | Observatório do Drone"
+titulo = f"Quantos drones tem no Brasil? {num(T)} | Observatório do Drone"
+# 17/11/2026: com "cadastrados" o title tinha 73 car. e o Google cortava a marca no resultado
+# (mostrava so "Quantos drones tem no Brasil? 193.411 cadastrados"). Assim fica em ~61 car.
 # 15/11/2026: o nome do projeto nao aparecia em title/H1/og, e a pagina nao saia nem na busca
 # pelo proprio nome. A marca vai no fim do title e na frente do og:title (compartilhamento).
 og_titulo = f"Observatório do Drone no Brasil: {num(T)} drones cadastrados ({_mes})"
@@ -721,7 +723,7 @@ FAQ = [
     ("Quantos drones tem no Brasil?",
      f"O Brasil tem {num(T)} drones cadastrados no SISANT, o cadastro da ANAC, na base de {_data}. "
      f"São {num(_pf)} em nome de pessoa física e {num(_pj)} em nome de {num(_emp)} empresas. "
-     f"Este Observatório recalcula o número todo mês, quando a ANAC publica a base nova."),
+     f"Este Observatório recalcula o número toda semana, a partir da base mais recente que a ANAC publica."),
     ("Quantos drones existem no Brasil, contando os que não têm cadastro?",
      "Não há número oficial para isso. O que existe é o cadastro: aeronaves registradas e com cadastro vigente. "
      "Drone sem registro não aparece no arquivo da ANAC, e drone já aposentado continua contando até o cadastro vencer. "
@@ -737,6 +739,12 @@ FAQ = [
     ("Quantos drones cadastrados são da DJI?",
      f"{num(dji['qtd'])} aeronaves, {pct(dji['qtd'] / T)} do cadastro. O modelo mais cadastrado é o "
      f"{_tm['modelo'].title().replace('Dji', 'DJI')} ({num(_tm['qtd'])})."),
+    ("Qual o drone mais vendido do Brasil?",
+     f"O cadastro da ANAC não registra venda, então não existe ranking oficial de vendas. O que dá para contar é o "
+     f"modelo mais cadastrado: o {modelos[0]['modelo'].title().replace('Dji', 'DJI')} ({num(modelos[0]['qtd'])}), "
+     f"seguido do {modelos[1]['modelo'].title().replace('Dji', 'DJI')} ({num(modelos[1]['qtd'])}) e do "
+     f"{modelos[2]['modelo'].title().replace('Dji', 'DJI')} ({num(modelos[2]['qtd'])}). Como o cadastro vale 24 meses, "
+     f"o ranking mostra o que está voando com registro hoje, não o que saiu da loja neste mês."),
     ("Quantos drones são cadastrados por mês?",
      f"{_mov} O pico da série foi de {num(pico['novos'])} emissões em {rotulo_mes(pico['mes'])}. "
      f"Emissão soma primeiro cadastro e renovação."),
@@ -745,12 +753,12 @@ FAQ = [
      f"O restante se divide em 250 g a 2 kg ({num(peso['250 g a 2 kg'])}), 2 a 25 kg ({num(peso['2 a 25 kg'])}) "
      f"e acima de 25 kg ({num(peso['Acima de 25 kg'])})."),
     ("O que é o Observatório do Drone no Brasil?",
-     "É um observatório de dados abertos sobre drones no Brasil, mantido por Irlen Menezes. Todo mês ele conta o "
+     "É um observatório de dados abertos sobre drones no Brasil, mantido por Irlen Menezes. Toda semana ele conta o "
      "cadastro de drones da ANAC (SISANT), cruza a frota agrícola com o registro do MAPA e a área plantada do IBGE "
      "e publica os números com método, dados em JSON e código aberto no GitHub. Não é um órgão do governo."),
     ("De onde vêm esses números e com que frequência são atualizados?",
      "Da contagem direta do arquivo público SISANT, da ANAC, sem estimativa de mercado. "
-     "O script roda de novo a cada base nova, todo mês, confere a consistência antes de publicar e guarda cada edição. "
+     "O script roda toda semana com a base mais recente, confere a consistência antes de publicar e guarda cada edição. "
      "Os dados consolidados ficam abertos em JSON, com método e código no GitHub."),
 ]
 if AG:
@@ -784,7 +792,7 @@ _webpage = {
 _faq = {"@type": "FAQPage", "@id": CANONICA + "#faq", "inLanguage": "pt-BR",
         "mainEntity": [{"@type": "Question", "name": q,
                         "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in FAQ]}
-_crumb = {"@type": "BreadcrumbList", "@id": CANONICA + "#breadcrumb", "itemListElement": [
+_crumb = {"@type": "BreadcrumbList", "@id": CANONICA + "#breadcrumb", "name": "Trilha de navegação", "itemListElement": [
     {"@type": "ListItem", "position": 1, "name": "Início", "item": "https://irlenmenezes.com.br/"},
     {"@type": "ListItem", "position": 2, "name": "Ferramentas", "item": "https://irlenmenezes.com.br/ferramentas/"},
     {"@type": "ListItem", "position": 3, "name": "Observatório do Drone no Brasil", "item": CANONICA}]}
@@ -1179,7 +1187,7 @@ html = f"""<!DOCTYPE html>
   <div class="sec-h"><span class="sec-n">{N_RECORTES + 1:02d}</span><div class="sec-t">
    <h2>Perguntas frequentes: quantos drones tem no Brasil</h2>
    <span class="sec-tag">Respostas diretas</span>
-   <p class="chapeu">As respostas saem dos mesmos números da página e mudam junto com a base, todo mês.</p>
+   <p class="chapeu">As respostas saem dos mesmos números da página e mudam junto com a base, toda semana.</p>
   </div></div>
   <div class="sec-c"><div class="faq">{FAQ_HTML}</div>{LEIA_HTML}</div>
  </section>
@@ -1224,7 +1232,7 @@ html = f"""<!DOCTYPE html>
     {num(RES['vencidos'])} vencidos que ainda não saíram do arquivo. Publicar esse trecho
     sugeriria que o mercado nasceu em 2024, então a série começa onde a janela é completa.</li>
    <li><strong>Atualização e checagem.</strong> A apuração é um script que roda de novo a cada base
-    nova publicada pela ANAC, todo mês. Antes de publicar, ele confere {len(META.get('checagens', []))}
+    nova publicada pela ANAC, toda semana. Antes de publicar, ele confere {len(META.get('checagens', []))}
     consistências: cada recorte tem de somar o total do arquivo (diferença só por filtro documentado,
     como a janela da série), a premissa dos 24 meses tem de valer e o total não pode variar mais de
     15% contra a edição anterior. Se uma falha, nada sobe. Os números desta página valem para

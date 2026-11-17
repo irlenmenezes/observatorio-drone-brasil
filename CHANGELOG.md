@@ -1,6 +1,11 @@
 # Histórico do método
 
 A versão sobe quando muda uma regra de contagem, normalização ou recorte. Base nova não muda a versão.
+Releases com um quarto número (ex.: 2026.11.1.1) trazem mudança de código, página ou rotina sem mudar o método.
+
+## 2026.11.1.1 (17/11/2026) · método continua 2026.11.1
+- Rotina passa de mensal para semanal (toda segunda). A ANAC atualiza o arquivo do SISANT várias vezes por mês; a rotina só publica quando a base é mais nova que a da página. As entradas e saídas continuam na janela fixa de cerca de 30 dias.
+- Página: o título fica em até ~61 caracteres para o nome do Observatório não ser cortado no resultado de busca; pergunta frequente nova ("Qual o drone mais vendido do Brasil?"), respondida com o modelo mais cadastrado e o aviso de que o SISANT não registra venda; nome na trilha de navegação do JSON-LD; textos dizem "toda semana".
 
 ## 2026.11.1 (14/11/2026)
 - Seção Agro, nova: drones agrícolas da ANAC cruzados com o registro de aviação agrícola do MAPA (SIPEAGRO, dados abertos) e com a área plantada da PAM 2025 do IBGE. Drone agrícola é o cadastro vigente com ramo agrícola ou de pulverização, ou com modelo de pulverizador declarado em outro ramo (2 kg ou mais). O casamento é drone a drone pelos 9 dígitos do número (PS no MAPA, PP na ANAC). Scripts novos: `obs_mapa_baixa.py`, `obs_agro.py`, `obs_agro_html.py`; referências fixas em `obs-agro-ref/`. O resultado entra no bloco `agro` do JSON da edição, com versão própria em `meta.versao_metodo_agro`.

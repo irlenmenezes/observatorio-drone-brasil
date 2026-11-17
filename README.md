@@ -71,7 +71,7 @@ python obs_agro.py caminho/sipeagroaviacaoagricolaregistro.csv   # -> obs-agro.j
 O `obs_build.py` só monta a seção Agro se o `obs-agro.json` for da mesma base ANAC da página.
 Sem ele, a página sai completa, só que sem as seções agro.
 
-`obs_rotina.py` encadeia tudo isso todo mês: baixa o CSV da ANAC e o do MAPA, guarda os
+`obs_rotina.py` encadeia tudo isso toda semana: baixa o CSV da ANAC e o do MAPA, guarda os
 snapshots, apura, gera e publica. Se o download ou a apuração do MAPA falhar, a página sai
 sem a seção Agro em vez de não sair. Sem o arquivo `obs_rotina.env` a rotina apura e gera a
 página, mas não publica.
@@ -178,7 +178,7 @@ Nada disso sai daqui:
 | `obs_mapa_baixa.py` | Baixa o CSV de registro de aviação agrícola do MAPA e guarda um snapshot datado em `snapshots/mapa/` (fora do repositório). |
 | `obs_agro.py` | Apura a seção Agro: regra do drone agrícola, cruzamento ANAC x MAPA, PAM, checagens e varredura de privacidade. Gera `obs-agro.json`. |
 | `obs_agro_html.py` | Monta as seções agro da página a partir do `obs-agro.json`. |
-| `obs_rotina.py` | Rotina mensal. |
+| `obs_rotina.py` | Rotina semanal (roda toda segunda e só publica se a ANAC tiver base nova). |
 | `cnpj-uf-cache.json` | UF, município e CNAE por CNPJ, da Receita Federal. Sem razão social. |
 | `obs-agro-ref/` | Referências fixas da seção Agro: PAM 2025 do IBGE (Brasil, UF e município), metadados da tabela 5457, lista de municípios do IBGE e UF + código IBGE da sede de cada CNPJ (Receita, competência 2026-10, sem razão social). |
 | `dados/observatorio-drone-brasil-AAAA-MM-DD.json` | Resultados consolidados de cada edição. A partir de 13/11/2026 trazem também o bloco `agro`. |
