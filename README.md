@@ -1,5 +1,7 @@
 # Observatório do Drone no Brasil
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24311430.svg)](https://doi.org/10.5281/zenodo.24311430)
+
 Apuração aberta e reproduzível do cadastro nacional de drones (SISANT/ANAC), publicada em
 **https://irlenmenezes.com.br/observatorio-drone-brasil/**.
 
@@ -201,9 +203,15 @@ Código sob [MIT](LICENSE). Dados consolidados em `dados/` sob
 As fontes primárias são a ANAC, o MAPA e o IBGE (dados abertos).
 
 > MENEZES, Irlen. Observatório do Drone no Brasil, base ANAC de 14/11/2026. Apuração sobre
-> o SISANT. Disponível em: https://irlenmenezes.com.br/observatorio-drone-brasil/
+> o SISANT. Disponível em: https://irlenmenezes.com.br/observatorio-drone-brasil/.
+> DOI: 10.5281/zenodo.24311430
 
-Metadados para gerenciadores de referência em [CITATION.cff](CITATION.cff).
+Cada release do repositório é arquivada no [Zenodo](https://doi.org/10.5281/zenodo.24311430)
+com DOI próprio. O DOI acima aponta sempre para a versão mais recente; para citar os números
+de uma base específica, use o DOI da versão correspondente, listado na página do Zenodo.
+
+Metadados para gerenciadores de referência em [CITATION.cff](CITATION.cff) e
+[.zenodo.json](.zenodo.json).
 
 ## Autor
 

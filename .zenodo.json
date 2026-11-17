@@ -1,0 +1,33 @@
+{
+  "title": "Observatório do Drone no Brasil",
+  "upload_type": "dataset",
+  "description": "<p>Apuração aberta e reproduzível do cadastro nacional de drones (SISANT/ANAC): total de aeronaves, série mensal de emissões, entradas e saídas entre bases, vencimentos, modelos e fabricantes mais cadastrados, ramo de atividade, faixa de peso, sede das empresas por UF e concentração da frota empresarial.</p><p>Desde a versão 2026.11.1, cruza os drones agrícolas da ANAC com o registro de aviação agrícola do MAPA (SIPEAGRO) e com a área plantada da PAM/IBGE, só com agregados.</p><p>Cada versão traz o código da apuração, os resultados consolidados de cada edição em <code>dados/</code> e o SHA-256 de cada arquivo de origem em <code>checksums.txt</code>. Os registros individuais não são redistribuídos: ficam nas fontes oficiais.</p><p>Página com os números da edição corrente: <a href=\"https://irlenmenezes.com.br/observatorio-drone-brasil/\">irlenmenezes.com.br/observatorio-drone-brasil</a></p>",
+  "creators": [
+    {
+      "name": "Menezes, Irlen",
+      "affiliation": "Independente"
+    }
+  ],
+  "keywords": [
+    "drone",
+    "SISANT",
+    "ANAC",
+    "RPAS",
+    "Brasil",
+    "dados abertos",
+    "drone agrícola",
+    "MAPA",
+    "SIPEAGRO",
+    "aviação agrícola",
+    "IBGE"
+  ],
+  "license": "MIT",
+  "notes": "Licenças: o código está sob MIT (arquivo LICENSE). Os dados consolidados em dados/ estão sob Creative Commons Atribuição 4.0 Internacional, CC BY 4.0 (arquivo LICENSE-DADOS.md). As fontes em obs-fonts/ estão sob SIL Open Font License 1.1. Fontes primárias: ANAC (SISANT), MAPA (SIPEAGRO) e IBGE (PAM, SIDRA tabela 5457), todas em dados abertos.",
+  "language": "por",
+  "related_identifiers": [
+    {
+      "identifier": "https://irlenmenezes.com.br/observatorio-drone-brasil/",
+      "relation": "isDocumentedBy"
+    }
+  ]
+}
