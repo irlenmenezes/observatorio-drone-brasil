@@ -3,7 +3,7 @@
 A versão sobe quando muda uma regra de contagem, normalização ou recorte. Base nova não muda a versão.
 Releases com um quarto número (ex.: 2026.11.1.1) trazem mudança de código, página ou rotina sem mudar o método.
 
-## Ainda sem release (21/11/2026) · método continua 2026.11.1
+## 2026.11.1.2 (21/11/2026) · método continua 2026.11.1
 Mudanças de página, código e rotina feitas entre 18 e 21/11/2026. Nenhuma regra de contagem mudou.
 - Topo da página: a resposta direta deixou de ser uma caixa colorida e virou texto com um fio fino em cima. Ao lado do total entrou um gráfico de abertura em dois painéis com o mesmo eixo de meses. Em cima, os cadastros vigentes acumulados pelo mês de emissão, numa curva monótona (não inventa pico nem vale entre dois meses), com destaque na fatia emitida a partir do mês em que a curva passa da metade. Embaixo, as emissões de cada mês, com o pico marcado e o mês corrente vazado, porque está incompleto. O título do gráfico sai dos próprios dados. A animação de entrada é só CSS e não roda para quem pede menos movimento no sistema; o detalhe de cada mês aparece ao passar o mouse ou tocar.
 - `obs_card.py`, novo: gera a cada edição o cartão de compartilhamento (`og:image`, 1200x630) e o selo `selo.png`. O cartão leva a data da base no nome, porque rede social e CDN guardam imagem pela URL; o selo tem URL fixa e cache curto. A página ganhou o bloco "Use este número no seu site", com a frase pronta (com link) e o código do selo.
