@@ -3,6 +3,17 @@
 A versão sobe quando muda uma regra de contagem, normalização ou recorte. Base nova não muda a versão.
 Releases com um quarto número (ex.: 2026.11.1.1) trazem mudança de código, página ou rotina sem mudar o método.
 
+## Ainda sem release (21/11/2026) · método continua 2026.11.1
+Mudanças de página, código e rotina feitas entre 18 e 21/11/2026. Nenhuma regra de contagem mudou.
+- Topo da página: a resposta direta deixou de ser uma caixa colorida e virou texto com um fio fino em cima. Ao lado do total entrou um gráfico de abertura em dois painéis com o mesmo eixo de meses. Em cima, os cadastros vigentes acumulados pelo mês de emissão, numa curva monótona (não inventa pico nem vale entre dois meses), com destaque na fatia emitida a partir do mês em que a curva passa da metade. Embaixo, as emissões de cada mês, com o pico marcado e o mês corrente vazado, porque está incompleto. O título do gráfico sai dos próprios dados. A animação de entrada é só CSS e não roda para quem pede menos movimento no sistema; o detalhe de cada mês aparece ao passar o mouse ou tocar.
+- `obs_card.py`, novo: gera a cada edição o cartão de compartilhamento (`og:image`, 1200x630) e o selo `selo.png`. O cartão leva a data da base no nome, porque rede social e CDN guardam imagem pela URL; o selo tem URL fixa e cache curto. A página ganhou o bloco "Use este número no seu site", com a frase pronta (com link) e o código do selo.
+- Planilhas CSV das tabelas principais em `csv/`: resumo, série mensal, vencimentos, empresas por UF, modelos, fabricantes, ramos e peso. Separador `;`, vírgula decimal e a data da base numa coluna. Elas também entram no `distribution` do Dataset.
+- JSON-LD: `datePublished` no Dataset, autor com o mesmo `@id` de pessoa do resto do site, ORCID em `identifier` e `sameAs` (e com link no item "Quem apura" da metodologia) e o cartão em `image`. O sitemap passou a dizer frequência semanal.
+- Links: a seção de entradas e saídas aponta para o boletim mais recente, achado pela API pública do WordPress do site (se a API falhar, vale um boletim fixo). As seções agro apontam para os posts do cruzamento ANAC x MAPA e do mapa por município.
+- Acessibilidade: as tabelas da seção Agro ganharam `<caption>`. O ramo aparece com acento na tela ("Agrícola / pulverização"); a chave no JSON não mudou.
+- Rotina: sobem também `og/`, `selo.png`, `csv/` e o `.htaccess` da pasta (cache curto do selo e dos CSV). Cartões com mais de 35 dias são apagados no servidor, e a varredura de e-mail e telefone antes de publicar passou a incluir os CSV.
+- Correção no build: o embrulho dos gráficos de seção casava qualquer `</svg>` e abria um `</div>` a mais quando a página ganhava outro SVG. Agora só embrulha os SVG de gráfico.
+
 ## 2026.11.1.1 (17/11/2026) · método continua 2026.11.1
 - Rotina passa de mensal para semanal (toda segunda). A ANAC atualiza o arquivo do SISANT várias vezes por mês; a rotina só publica quando a base é mais nova que a da página. As entradas e saídas continuam na janela fixa de cerca de 30 dias.
 - Página: o título fica em até ~61 caracteres para o nome do Observatório não ser cortado no resultado de busca; pergunta frequente nova ("Qual o drone mais vendido do Brasil?"), respondida com o modelo mais cadastrado e o aviso de que o SISANT não registra venda; nome na trilha de navegação do JSON-LD; textos dizem "toda semana".

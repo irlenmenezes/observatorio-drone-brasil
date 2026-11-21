@@ -11,12 +11,17 @@ Uso:  python obs_build.py    ->  ../../observatorio-drone/index.html
 """
 import json
 import math
+import re
 import os
 import shutil
 from pathlib import Path
 
 BASE = Path(__file__).parent
 DADOS = BASE / "obs-drone.json"
+try:  # cartão de compartilhamento e selo (20/11/2026); precisa de Playwright + Chrome
+    import obs_card
+except Exception:  # noqa: clone sem Playwright gera a página sem as imagens novas
+    obs_card = None
 # Saida: OBS_DESTINO, senao a pasta irma "observatorio-drone" (layout de producao),
 # senao ./site (layout de um clone do repositorio)
 _padrao = BASE.parent / "observatorio-drone"
@@ -192,6 +197,43 @@ def bloco(id_, titulo, chapeu, corpo, nota=None, tabela_html=None,
             f'<div class="sec-c">{corpo}{n}{t}</div></section>')
 
 
+
+# ------------------------------------------------------------------ boletim mensal mais recente
+# Descoberto no WordPress a cada build, para a pagina sempre linkar o boletim novo (link interno a partir da
+# pagina que o Google mais visita). Se a API falhar, fica o padrao abaixo e o build segue.
+BOLETIM_PADRAO = ("drones-no-brasil-novembro-2026-193-mil-cadastrados-anac-sisant-numeros",
+                  "Drones no Brasil em novembro de 2026: 193 mil cadastrados")
+POST_AGRO = "drones-agricolas-anac-registro-mapa-sipeagro-cruzamento-2026"
+POST_AGRO_MUN = "onde-estao-cnpjs-de-pulverizacao-com-drone-mapa-por-municipio-sisant-2026"
+MESES_SLUG = {"marco": "março"}
+
+
+def _boletim_mais_recente():
+    import re as _re, html as _h, urllib.request as _u
+    padrao = _re.compile(r"^drones-no-brasil-([a-z]+)-(\d{4})-\d+-mil-cadastrados-anac-sisant-numeros$")
+    try:
+        req = _u.Request("https://irlenmenezes.com.br/wp-json/wp/v2/posts?search=cadastrados%20sisant"
+                         "&per_page=40&orderby=date&order=desc&_fields=slug,title",
+                         headers={"User-Agent": "Mozilla/5.0 (build do Observatorio do Drone)"})
+        with _u.urlopen(req, timeout=20) as r:
+            posts = json.load(r)
+        for p in posts:
+            m = padrao.match(p.get("slug", ""))
+            if m:
+                titulo = _h.unescape(_re.sub(r"<[^>]+>", "", p["title"]["rendered"])).strip()
+                return p["slug"], titulo, MESES_SLUG.get(m.group(1), m.group(1))
+    except Exception as e:  # noqa
+        print(f"aviso: boletim mais recente nao veio do WordPress ({e}); usando o padrao")
+    s, t = BOLETIM_PADRAO
+    return s, t, padrao.match(s).group(1)
+
+
+BOL_SLUG, BOL_TITULO, BOL_MES = _boletim_mais_recente()
+BOL_URL = f"https://irlenmenezes.com.br/{BOL_SLUG}/"
+BOL_FRASE = f' Os destaques do mês estão no <a href="{BOL_URL}">boletim de {BOL_MES}</a>.'
+print(f"boletim linkado: {BOL_SLUG}")
+
+
 # ------------------------------------------------------------------ conteudo
 serie = d["serie"]
 parciais = {s["mes"] for s in serie if s.get("parcial")}
@@ -213,7 +255,12 @@ total_emp = sum(d["uf"]["empresas"].values())
 
 modelos = d["modelos"]
 fabs = d["fabricantes"]
-ramos = list(d["ramos"].items())
+# o obs_apura grava os grupos de ramo sem acento (chave estável); acento só na exibição (20/11/2026)
+ROTULO_RAMO = {"Agricola / pulverizacao": "Agrícola / pulverização",
+               "Seguranca publica e defesa civil": "Segurança pública e defesa civil",
+               "Inspecao tecnica": "Inspeção técnica", "Nao informado": "Não informado",
+               "Fiscalizacao e orgaos estatais": "Fiscalização e órgãos estatais"}
+ramos = [(ROTULO_RAMO.get(r, r), n) for r, n in d["ramos"].items()]
 peso = d["peso"]
 ORDEM_PESO = ["Ate 250 g", "250 g a 2 kg", "2 a 25 kg", "Acima de 25 kg"]
 ROTULO_PESO = {"Ate 250 g": "Até 250 g", "250 g a 2 kg": "250 g a 2 kg",
@@ -316,7 +363,7 @@ if DIFF:
         f"Entre {de} e {ate} o arquivo cresceu {num(saldo)} registros, mas esse número é um saldo. "
         f"Entraram {num(novos_cod)} códigos novos e saíram {num(saidas)}; outros {num(renov)} "
         f"cadastros foram renovados. Todo dia entram cerca de {num(round(novos_cod / dias))} "
-        f"aeronaves e saem {num(round(saidas / dias))}.",
+        f"aeronaves e saem {num(round(saidas / dias))}." + BOL_FRASE,
         mov_html,
         nota=f"Comparação código a código (CODIGO_AERONAVE) entre os dois arquivos guardados, de "
              f"{de} e {ate}, {dias} dias"
@@ -628,6 +675,43 @@ N_RECORTES = len(secoes)
 POR_EXTENSO = {9: "Nove", 10: "Dez", 11: "Onze", 12: "Doze", 13: "Treze", 14: "Catorze", 15: "Quinze", 16: "Dezesseis"}
 JSON_ATUAL = f"dados/observatorio-drone-brasil-{META['data_base']}.json"
 
+# Autor: mesmo @id da Person que o Yoast publica no resto do site, para o Google juntar as duas
+# (20/11/2026). sameAs = os perfis que a página /sobre/ já declara.
+AUTOR_ID = "https://irlenmenezes.com.br/#/schema/person/2e1d7a26cae25ced41645437d455cc6a"
+ORCID = "0009-0001-7988-0340"  # criado por ele em 20/11/2026
+ORCID_URL = "https://orcid.org/" + ORCID
+AUTOR_SAMEAS = [ORCID_URL, "https://github.com/irlenmenezes", "https://www.linkedin.com/in/irlenmenezes/",
+                "https://www.youtube.com/@Irlenmenezes", "https://www.instagram.com/vinnaum/", "https://x.com/vinnaum"]
+AUTOR = {"@type": "Person", "@id": AUTOR_ID, "name": "Irlen Menezes", "url": "https://irlenmenezes.com.br/sobre/",
+         "identifier": {"@type": "PropertyValue", "propertyID": "ORCID", "value": ORCID, "url": ORCID_URL},
+         "jobTitle": "Cientista de dados",
+         "alumniOf": {"@type": "CollegeOrUniversity", "name": "PUC Minas"},
+         "knowsAbout": ["Legislação e regulação de drones no Brasil", "RBAC 100", "ICA 100-40", "SISANT"],
+         "sameAs": AUTOR_SAMEAS}
+
+# Planilhas CSV da edição corrente (20/11/2026): URL fixa, sobrescrita a cada build.
+# Jornalista abre no Excel, então vai com ; e BOM (o Excel em português lê certo).
+CSVS = [("resumo", "resumo"), ("serie-mensal", "série mensal"), ("vencimentos", "vencimentos"),
+        ("empresas-por-uf", "empresas por UF"), ("modelos", "modelos"), ("fabricantes", "fabricantes"),
+        ("ramos", "ramos de atividade"), ("peso", "faixas de peso")]
+
+# Cartão de compartilhamento (og:image) e selo para embed. Gerados ANTES do HTML porque as
+# metatags só entram se a imagem existir. Se o Playwright falhar, usa o cartão mais recente que
+# já estiver na pasta (número de uma edição anterior é melhor que link sem imagem).
+OG_REL = None
+if obs_card:
+    try:
+        _cards = obs_card.gera(DESTINO, T, RES["pf"], RES["pj"], META["data_base"], completos)
+        OG_REL = _cards["og"]
+        print(f"cartao og: {OG_REL} · selo: {_cards['selo']}")
+    except Exception as e:  # noqa
+        print(f"AVISO: cartao/selo nao gerados ({e})")
+if not OG_REL:
+    _velhos = sorted((DESTINO / "og").glob("observatorio-drone-brasil-*.png")) if (DESTINO / "og").exists() else []
+    OG_REL = f"og/{_velhos[-1].name}" if _velhos else None
+OG_URL = CANONICA + OG_REL if OG_REL else None
+TEM_SELO = (DESTINO / "selo.png").exists()
+
 _ds = ({
     "@type": "Dataset",
     "@id": CANONICA + "#dataset",
@@ -641,6 +725,7 @@ _ds = ({
     "keywords": ["drone", "SISANT", "ANAC", "cadastro de drone", "Brasil", "RPAS"],
     "temporalCoverage": f"{serie[0]['mes']}/{serie[-1]['mes']}",
     "spatialCoverage": {"@type": "Place", "name": "Brasil"},
+    "datePublished": "2026-08-05",
     "dateModified": META["data_base"],
     "version": META["data_base"],
     "isAccessibleForFree": True,
@@ -659,7 +744,9 @@ _ds = ({
         {"@type": "DataDownload", "encodingFormat": "application/json",
          "name": "Dados consolidados, edição corrente",
          "contentUrl": CANONICA + "observatorio-drone-brasil.json"},
-    ],
+    ] + [{"@type": "DataDownload", "encodingFormat": "text/csv",
+          "name": f"Planilha CSV: {rot}, base de {data_br(META['data_base'])}",
+          "contentUrl": CANONICA + f"csv/{arq}.csv"} for arq, rot in CSVS],
     # O Google valida o isBasedOn como um Dataset COMPLETO e independente, entao ele
     # precisa dos campos obrigatorios por conta propria. Sem "description" da erro
     # critico na inspecao de URL (flagado em 07/08/2026). O "creator" tambem precisa
@@ -676,12 +763,7 @@ _ds = ({
                               "name": "Agência Nacional de Aviação Civil (ANAC)",
                               "url": "https://www.gov.br/anac/"},
                   "url": "https://sistemas.anac.gov.br/dadosabertos/"},
-    "creator": {"@type": "Person", "name": "Irlen Menezes",
-                "url": "https://irlenmenezes.com.br/",
-                "jobTitle": "Cientista de dados",
-                "alumniOf": {"@type": "CollegeOrUniversity", "name": "PUC Minas"},
-                "knowsAbout": ["Legislação e regulação de drones no Brasil", "RBAC 100", "ICA 100-40", "SISANT"],
-                "sameAs": ["https://www.linkedin.com/in/irlenmenezes", "https://x.com/vinnaum"]},
+    "creator": AUTOR,
     "license": "https://creativecommons.org/licenses/by/4.0/",
     "variableMeasured": [
         {"@type": "PropertyValue", "name": "Aeronaves cadastradas", "value": T},
@@ -691,6 +773,8 @@ _ds = ({
          "value": round(dji["qtd"] / T * 100, 1), "unitText": "%"},
     ],
 })
+if OG_URL:
+    _ds["image"] = OG_URL
 
 _data = data_br(META["data_base"])
 _mes = rotulo_mes(META["data_base"][:7], curto=False)
@@ -721,6 +805,155 @@ descricao = (f"O Brasil tem {num(T)} drones cadastrados na ANAC (base de {_data}
 RESPOSTA = (f"<strong>O Brasil tem {num(T)} drones cadastrados na ANAC</strong>, na base de {_data}. "
             f"{num(_pf)} estão em nome de pessoa física e {num(_pj)} em nome de {num(_emp)} empresas. "
             f"{_mov} O número conta só cadastro vigente, então drone sem registro não entra.")
+
+# 21/11/2026 (v2, pedido dele: "grafico animado alto padrao, padrao ouro da ciencia de dados" e o
+# "buraco branco" do desktop): grafico de abertura na coluna da direita, abaixo do numero.
+# Dois paineis com o MESMO eixo X (nunca dois eixos Y no mesmo plano):
+#  - em cima, os cadastros vigentes acumulados pelo mes de emissao (curva monotona Fritsch-Carlson,
+#    sem overshoot), com destaque na fatia emitida a partir do mes em que a curva passa da metade;
+#  - embaixo, as emissoes de cada mes, pico em destaque e mes corrente vazado.
+# Animacao so com prefers-reduced-motion:no-preference, e ela termina sozinha. Hover por mes so com
+# CSS (sem JS): linha-guia, ponto na curva e etiqueta com o mes, as emissoes e o acumulado.
+# O SVG NAO comeca com "<svg viewBox", senao ganha a caixa de rolagem dos graficos de secao.
+MESES_EXT = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto",
+             "setembro", "outubro", "novembro", "dezembro"]
+
+
+def _tangentes(xs, ys):
+    """Tangentes da interpolacao cubica monotona (Fritsch-Carlson)."""
+    n = len(xs)
+    dl = [(ys[i + 1] - ys[i]) / (xs[i + 1] - xs[i]) for i in range(n - 1)]
+    m = [dl[0]] + [((dl[i - 1] + dl[i]) / 2 if dl[i - 1] * dl[i] > 0 else 0.0) for i in range(1, n - 1)] + [dl[-1]]
+    for i in range(n - 1):
+        if dl[i] == 0:
+            m[i] = m[i + 1] = 0.0
+            continue
+        a, b = m[i] / dl[i], m[i + 1] / dl[i]
+        h = a * a + b * b
+        if h > 9:
+            t = 3 / math.sqrt(h)
+            m[i], m[i + 1] = t * a * dl[i], t * b * dl[i]
+    return m
+
+
+def _trecho(xs, ys, m, i0, i1):
+    out = [f"M{xs[i0]:.1f},{ys[i0]:.1f}"]
+    for i in range(i0, i1):
+        dx = (xs[i + 1] - xs[i]) / 3
+        out.append(f"C{xs[i] + dx:.1f},{ys[i] + m[i] * dx:.1f} {xs[i + 1] - dx:.1f},{ys[i + 1] - m[i + 1] * dx:.1f} "
+                   f"{xs[i + 1]:.1f},{ys[i + 1]:.1f}")
+    return "".join(out)
+
+
+def grafico_abertura():
+    s = serie
+    n = len(s)
+    fim = s[-1]["acumulado"]
+    W, H = 460, 312
+    x0, x1 = 6, 404                      # sobra a direita para o rotulo do ponto final
+    passo_x = (x1 - x0) / n
+    T0, T1 = 40, 184                     # painel do acumulado (T1 = linha de base)
+    B0, B1 = 226, 280                    # painel das emissoes por mes
+    _, topo = escala(fim, 2)
+    ya = lambda v: T1 - (T1 - T0) * v / topo
+    bmax = max(x["novos"] for x in s)
+    yb = lambda v: B1 - (B1 - B0) * v / bmax
+
+    # vertices do acumulado: inicio da janela (zero) e o fim de cada mes; o mes corrente termina
+    # no dia da base, nao no fim do mes
+    xs, ys = [x0], [T1]
+    for i, x in enumerate(s):
+        frac = (x["dias"] / 30) if x.get("parcial") and x.get("dias") else 1
+        xs.append(x0 + passo_x * (i + min(frac, 1)))
+        ys.append(ya(x["acumulado"]))
+    m = _tangentes(xs, ys)
+    curva_d = _trecho(xs, ys, m, 0, n)
+
+    # mes em que a curva passa da metade: a fatia emitida dali em diante vai em destaque
+    k = next(i for i, x in enumerate(s) if x["acumulado"] >= fim / 2)
+    antes = s[k - 1]["acumulado"] if k else 0
+    fatia = (fim - antes) / fim
+    a_mes, m_mes = s[k]["mes"].split("-")
+    nome_k = MESES_EXT[int(m_mes) - 1]
+    ano_base = META["data_base"][:4]
+    desde = f"de {nome_k} para cá" if a_mes == ano_base else f"de {nome_k} de {a_mes} para cá"
+    titulo = f"Mais da metade dos cadastros vigentes saiu {desde}"
+
+    area_tudo = curva_d + f"L{xs[-1]:.1f},{T1}L{x0},{T1}Z"
+    area_fatia = _trecho(xs, ys, m, k, n) + f"L{xs[-1]:.1f},{T1}L{xs[k]:.1f},{T1}Z"
+
+    g = []
+    # grade e linha de base do painel de cima
+    for v in (topo / 2, topo):
+        y = ya(v)
+        g.append(f'<line class="hc-g" x1="{x0}" y1="{y:.1f}" x2="{x1}" y2="{y:.1f}"/>'
+                 f'<text class="hc-gt" x="{x0}" y="{y - 5:.1f}">{num(int(v / 1000))} mil</text>')
+    g.append(f'<line class="hc-base" x1="{x0}" y1="{T1}" x2="{x1}" y2="{T1}"/>')
+    g.append(f'<text class="hc-k" x="{x0}" y="14">ACUMULADO, PELO MÊS DE EMISSÃO</text>')
+    g.append(f'<path class="hc-a" d="{area_tudo}"/><path class="hc-a2" d="{area_fatia}"/>')
+    g.append(f'<path class="hc-l" d="{curva_d}" pathLength="1"/>')
+    # marcador da metade e a anotacao
+    xk = xs[k]
+    g.append(f'<g class="hc-anot"><line class="hc-mk" x1="{xk:.1f}" y1="{T1}" x2="{xk:.1f}" y2="{T0 + 4}"/>'
+             f'<text class="hc-t" x="{xk - 8:.1f}" y="{T0 + 14}" text-anchor="end"><tspan class="hc-bold">{pct(fatia, 0)} dos cadastros</tspan></text>'
+             f'<text class="hc-t2" x="{xk - 8:.1f}" y="{T0 + 30}" text-anchor="end">emitidos {desde.replace("de ", "desde ", 1).replace(" para cá", "")}</text></g>')
+    # ponto final com pulso e rotulo
+    xf, yf = xs[-1], ys[-1]
+    g.append(f'<circle class="hc-pulso" cx="{xf:.1f}" cy="{yf:.1f}" r="4"/>'
+             f'<circle class="hc-fim" cx="{xf:.1f}" cy="{yf:.1f}" r="4"/>'
+             f'<text class="hc-fv" x="{xf + 9:.1f}" y="{yf + 4:.1f}">{num(round(fim / 1000))} mil</text>'
+             f'<text class="hc-fd" x="{xf + 9:.1f}" y="{yf + 19:.1f}">{data_br(META["data_base"])[:5]}</text>')
+
+    # painel de baixo: emissoes por mes
+    g.append(f'<text class="hc-k" x="{x0}" y="{B0 - 10}">EMISSÕES POR MÊS</text>')
+    larg_b = passo_x * 0.68
+    pico_i = max((i for i, x in enumerate(s) if not x.get("parcial")), key=lambda i: s[i]["novos"])
+    for i, x in enumerate(s):
+        cx = x0 + passo_x * (i + .5)
+        y = yb(x["novos"])
+        cls = "hc-b parc" if x.get("parcial") else ("hc-b pico" if i == pico_i else "hc-b")
+        g.append(f'<rect class="{cls}" style="--i:{i}" x="{cx - larg_b / 2:.1f}" y="{y:.1f}" '
+                 f'width="{larg_b:.1f}" height="{B1 - y:.1f}"/>')
+    cxp = x0 + passo_x * (pico_i + .5)
+    g.append(f'<text class="hc-pv" x="{cxp:.1f}" y="{yb(s[pico_i]["novos"]) - 7:.1f}" text-anchor="middle">'
+             f'{num(s[pico_i]["novos"])} em {rotulo_mes(s[pico_i]["mes"], True)}</text>')
+    g.append(f'<line class="hc-base" x1="{x0}" y1="{B1}" x2="{x1}" y2="{B1}"/>')
+    # eixo X: primeiro, meio e ultimo mes
+    for i, anc in ((0, "start"), (n // 2, "middle"), (n - 1, "end")):
+        xx = x0 if anc == "start" else (x0 + passo_x * (i + .5) if anc == "middle" else x1)
+        g.append(f'<text class="hc-gt" x="{xx:.1f}" y="{B1 + 17}" text-anchor="{anc}">{rotulo_mes(s[i]["mes"], True)}</text>')
+
+    # hover por mes, em HTML por cima do SVG (posicoes em %, o texto fica nitido e do tamanho certo
+    # em qualquer tela): linha-guia, ponto na curva e etiqueta com o mes, as emissoes e o acumulado
+    ov = []
+    alt_m = B1 / H * 100
+    for i, x in enumerate(s):
+        esq = x0 + passo_x * i
+        lado = "d" if i < n * 0.55 else "e"
+        rot = rotulo_mes(x["mes"]) + (" (parcial)" if x.get("parcial") else "")
+        ov.append(f'<div class="hc-m" style="left:{esq / W * 100:.3f}%;width:{passo_x / W * 100:.3f}%;height:{alt_m:.3f}%">'
+                  f'<i class="hc-guia" style="top:{(T0 - 6) / B1 * 100:.2f}%"></i>'
+                  f'<i class="hc-pto" style="left:{(xs[i + 1] - esq) / passo_x * 100:.2f}%;top:{ys[i + 1] / B1 * 100:.2f}%"></i>'
+                  f'<span class="hc-tip {lado}" style="top:{(T0 - 4) / B1 * 100:.2f}%"><b>{rot}</b>'
+                  f'{num(x["novos"])} emissões<br>acumulado {num(x["acumulado"])}</span></div>')
+
+    resumo = (f"Dos {num(fim)} cadastros vigentes emitidos nos últimos 24 meses, {pct(fatia, 0)} saíram "
+              f"{desde.replace(' para cá', '')} até {_data}. O mês com mais emissões foi "
+              f"{rotulo_mes(s[pico_i]['mes'])}, com {num(s[pico_i]['novos'])}.")
+    svg = (f'<svg class="hc" viewBox="0 0 {W} {H}" role="img" aria-labelledby="hc-tt hc-dd">'
+           f'<title id="hc-tt">{esc(titulo)}</title><desc id="hc-dd">{esc(resumo)}</desc>{"".join(g)}</svg>')
+    parcial_txt = (f" {rotulo_mes(mes_parcial['mes'])} vai até o dia {int(META['data_base'][8:])}."
+                   if mes_parcial else "")
+    return (f'\n    <figure class="hc-f">'
+            f'<figcaption class="hc-cab"><span class="hc-tit">{esc(titulo)}</span>'
+            f'<span class="hc-sub">Cadastros vigentes somados pelo mês em que cada um foi emitido, e as emissões de cada '
+            f'mês. Primeiro cadastro e renovação contam como emissão.</span></figcaption>'
+            f'<div class="hc-w">{svg}<div class="hc-ov" aria-hidden="true">{"".join(ov)}</div></div>'
+            f'<p class="hc-fonte">Fonte: SISANT/ANAC, base de {_data}.{parcial_txt} '
+            f'<a href="#crescimento">Mês a mês na seção 01</a></p></figure>')
+
+
+HERO_GRAF = grafico_abertura()
 
 FAQ = [
     ("Quantos drones tem no Brasil?",
@@ -769,16 +1002,18 @@ if AG:
     FAQ[2] = (FAQ[2][0], AG["faq_agro"])
     FAQ.insert(3, AG["faq_mapa"])
 FAQ_HTML = "".join(f'<div class="q"><h3>{esc(q)}</h3><p>{esc(a)}</p></div>' for q, a in FAQ)
-LEIA = [
-    ("drones-no-brasil-outubro-2026-190-mil-cadastrados-anac-sisant-numeros",
-     "Boletim de outubro: saldo de 4 mil em 28 dias e quem mais cresceu"),
+LEIA = [(BOL_SLUG, f"Boletim de {BOL_MES}: " + (BOL_TITULO.split(": ", 1)[1] if ": " in BOL_TITULO else BOL_TITULO))]
+if AG:
+    LEIA += [(POST_AGRO, "Quantos drones agrícolas da ANAC estão no registro do MAPA, estado por estado"),
+             (POST_AGRO_MUN, "Em que cidade estão as empresas de pulverização com drone")]
+LEIA += [
     ("frota-drones-brasil-serie-historica-2022-2026", "A série histórica de quatro anos de drone no Brasil"),
     ("quantos-drones-cadastrados-brasil-2026-numeros-sisant", "Quantos drones existem no Brasil: como ler os números do SISANT"),
     ("cadastro-sisant-vencendo-como-renovar-2026", "Cadastro do SISANT venceu? Como renovar"),
     ("cadastro-sisant-drone-passo-a-passo-2026", "Como cadastrar o drone no SISANT, passo a passo"),
 ]
 LEIA_HTML = ('<div class="leia"><h3>Para entender e usar os números</h3><ul>'
-             + "".join(f'<li><a href="https://irlenmenezes.com.br/{sl}/">{t}</a></li>' for sl, t in LEIA)
+             + "".join(f'<li><a href="https://irlenmenezes.com.br/{sl}/">{esc(t)}</a></li>' for sl, t in LEIA)
              + '</ul></div>')
 
 _hoje = META["processado_em"][:10]
@@ -789,9 +1024,11 @@ _webpage = {
     "about": {"@id": CANONICA + "#dataset"}, "mainEntity": {"@id": CANONICA + "#dataset"},
     "breadcrumb": {"@id": CANONICA + "#breadcrumb"},
     "isPartOf": {"@type": "WebSite", "name": "Irlen Menezes", "url": "https://irlenmenezes.com.br/"},
-    "author": {"@type": "Person", "name": "Irlen Menezes", "url": "https://irlenmenezes.com.br/sobre/"},
-    "publisher": {"@type": "Person", "name": "Irlen Menezes", "url": "https://irlenmenezes.com.br/"},
+    "author": {"@type": "Person", "@id": AUTOR_ID, "name": "Irlen Menezes", "url": "https://irlenmenezes.com.br/sobre/"},
+    "publisher": {"@type": "Person", "@id": AUTOR_ID, "name": "Irlen Menezes", "url": "https://irlenmenezes.com.br/sobre/"},
 }
+if OG_URL:
+    _webpage["primaryImageOfPage"] = {"@type": "ImageObject", "url": OG_URL, "width": 1200, "height": 630}
 _faq = {"@type": "FAQPage", "@id": CANONICA + "#faq", "inLanguage": "pt-BR",
         "mainEntity": [{"@type": "Question", "name": q,
                         "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in FAQ]}
@@ -862,7 +1099,7 @@ a:hover{text-decoration-color:currentColor}
 .atualiza b{color:var(--ink);font-weight:500}
 .tema{margin-left:12px;border:1px solid var(--fio);background:transparent;color:var(--ink);border-radius:999px;padding:4px 12px;font:500 11.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
 .tema:hover{border-color:var(--ink)}
-.hero-g{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);gap:48px;align-items:end;
+.hero-g{display:grid;grid-template-columns:minmax(0,1.04fr) minmax(0,.96fr);gap:52px;align-items:start;
  padding:40px 0 34px;border-bottom:1px solid var(--fio)}
 h1{font-family:var(--serif);font-weight:800;font-size:clamp(34px,4.6vw,56px);line-height:1.04;
  letter-spacing:-.03em;margin:18px 0 0;max-width:17ch}
@@ -1018,9 +1255,62 @@ footer p{margin:0 0 6px}
 }
 
 /* resposta direta + perguntas (02/11/2026) */
-.resposta{margin:22px 0 0;padding:16px 18px;border-left:4px solid var(--acento);background:var(--sup);
- border-radius:0 8px 8px 0;font-size:clamp(16px,1.45vw,18px);line-height:1.6;color:var(--ink);max-width:58ch}
-.resposta strong{font-weight:800}
+/* 21/11/2026: a caixa com barra laranja (cara de IA) virou texto com fio fino; o grafico de abertura
+   animado (dois paineis, mesmo eixo X) ocupa a coluna da direita, abaixo do numero */
+.resp{margin:22px 0 0;max-width:58ch;padding-top:18px;border-top:1px solid var(--fio)}
+.resp-t{margin:0;font-size:clamp(16px,1.45vw,18px);line-height:1.6;color:var(--ink)}
+.resp-t strong{font-weight:800}
+.hc-f{margin:24px 0 0;padding-top:18px;border-top:1px solid var(--fio)}
+.hc-cab{display:block}
+.hc-tit{display:block;font-family:var(--serif);font-weight:800;font-size:clamp(17px,1.45vw,19px);line-height:1.28;letter-spacing:-.012em;color:var(--ink)}
+.hc-sub{display:block;margin-top:6px;font-size:13px;line-height:1.5;color:var(--ink2)}
+.hc-w{position:relative;margin-top:14px}
+svg.hc{display:block;width:100%;height:auto;overflow:visible;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.hc-g{stroke:var(--grade);stroke-width:1;stroke-dasharray:2 4}
+.hc-base{stroke:var(--eixo);stroke-width:1}
+.hc-gt{fill:var(--mudo);font-size:11px}
+.hc-k{fill:var(--ink2);font-size:10.5px;letter-spacing:.08em}
+.hc-a{fill:var(--tinta);opacity:.07}
+.hc-a2{fill:var(--tinta);opacity:.2}
+.hc-l{fill:none;stroke:var(--tinta);stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}
+.hc-mk{stroke:var(--ink2);stroke-width:1;stroke-dasharray:2 3}
+.hc-t{fill:var(--ink);font-size:12px}
+.hc-t2{fill:var(--ink2);font-size:11.5px}
+.hc-bold{font-weight:600}
+.hc-fim{fill:var(--tinta);stroke:var(--papel);stroke-width:2}
+.hc-pulso{fill:none;stroke:var(--tinta);stroke-width:1.5;opacity:0}
+.hc-fv{fill:var(--ink);font-size:13px;font-weight:600}
+.hc-fd{fill:var(--mudo);font-size:11px}
+.hc-b{fill:var(--tinta);opacity:.42}
+.hc-b.pico{fill:var(--hi);opacity:1}
+.hc-b.parc{fill:none;stroke:var(--tinta);stroke-width:1;stroke-dasharray:2 2;opacity:.75}
+.hc-pv{fill:var(--ink);font-size:11.5px;font-weight:500}
+.hc-fonte{margin:8px 0 0;font-family:var(--mono);font-size:11.5px;line-height:1.5;color:var(--mudo)}
+.hc-fonte a{color:var(--linkc)}
+.hc-ov{position:absolute;inset:0}
+.hc-m{position:absolute;top:0;cursor:crosshair;-webkit-tap-highlight-color:transparent}
+.hc-guia{position:absolute;left:50%;bottom:0;width:1px;margin-left:-.5px;background:var(--ink2);opacity:0}
+.hc-pto{position:absolute;width:10px;height:10px;margin:-5px 0 0 -5px;box-sizing:border-box;border:2px solid var(--tinta);
+ background:var(--papel);border-radius:50%;opacity:0}
+.hc-tip{position:absolute;z-index:2;white-space:nowrap;font:400 12px/1.45 var(--mono);color:var(--ink2);background:var(--papel);
+ border:1px solid var(--fio);border-radius:4px;padding:6px 9px;opacity:0;pointer-events:none;font-variant-numeric:tabular-nums}
+.hc-tip b{display:block;color:var(--ink);font-weight:600}
+.hc-tip.d{left:calc(50% + 10px)} .hc-tip.e{right:calc(50% + 10px)}
+.hc-m:hover .hc-guia{opacity:.5}
+.hc-m:hover .hc-pto,.hc-m:hover .hc-tip{opacity:1}
+.hc-w:hover .hc-anot{opacity:.15;transition:opacity .2s}
+@media (prefers-reduced-motion:no-preference){
+ .hc-l{stroke-dasharray:1;stroke-dashoffset:1;animation:hc-traco 1.9s cubic-bezier(.33,.7,.2,1) .25s forwards}
+ .hc-a,.hc-a2{animation:hc-surge 1s ease-out 1.25s backwards}
+ .hc-b{transform-box:fill-box;transform-origin:center bottom;animation:hc-sobe .55s cubic-bezier(.2,.7,.2,1) backwards;animation-delay:calc(.3s + var(--i) * 30ms)}
+ .hc-anot,.hc-pv{animation:hc-surge .6s ease-out 1.95s backwards}
+ .hc-fim,.hc-fv,.hc-fd{animation:hc-surge .4s ease-out 2.05s backwards}
+ .hc-pulso{transform-box:fill-box;transform-origin:center;animation:hc-pulso 1.6s ease-out 2.2s 3}
+}
+@keyframes hc-traco{to{stroke-dashoffset:0}}
+@keyframes hc-surge{from{opacity:0}}
+@keyframes hc-sobe{from{transform:scaleY(0)}}
+@keyframes hc-pulso{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(3.4)}}
 .faq{display:grid;gap:0;max-width:74ch}
 .faq .q{padding:18px 0;border-top:1px solid var(--fio)}
 .faq .q:first-child{border-top:0;padding-top:0}
@@ -1097,7 +1387,74 @@ CSS = CSS.replace("__ESCURO__", ESCURO)
 if AG:
     CSS += AG["css"]
 
+# ------------------------------------------------ compartilhar, citar e embedar (20/11/2026)
+OG_META = ""
+if OG_URL:
+    _og_alt = f"Quantos drones tem no Brasil? {num(T)} drones cadastrados na ANAC, base de {data_br(META['data_base'])}. Observatório do Drone no Brasil."
+    OG_META = (f'<meta property="og:image" content="{OG_URL}">\n'
+               f'<meta property="og:image:secure_url" content="{OG_URL}">\n'
+               '<meta property="og:image:type" content="image/png">\n'
+               '<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n'
+               f'<meta property="og:image:alt" content="{esc(_og_alt)}">\n'
+               f'<meta name="twitter:image" content="{OG_URL}">\n'
+               f'<meta name="twitter:image:alt" content="{esc(_og_alt)}">\n')
+
+CSV_LINKS = " · ".join(f'<a href="csv/{arq}.csv" download>{rot}</a>' for arq, rot in CSVS)
+
+# Frase e selo prontos para colar. O link é o que importa: cada site que cola leva o leitor (e
+# o robô de busca) para a página com a base mais nova, em vez de cada um escrever o crédito do seu jeito.
+_frase_html = (f'Segundo o <a href="{CANONICA}">Observatório do Drone no Brasil</a>, o país tem '
+               f'{num(T)} drones cadastrados na ANAC (base de {data_br(META["data_base"])}).')
+_selo_alt = "Quantos drones tem no Brasil: total de drones cadastrados na ANAC, atualizado toda semana pelo Observatório do Drone"
+_selo_html = (f'<a href="{CANONICA}"><img src="{CANONICA}selo.png" width="320" height="100" '
+              f'alt="{_selo_alt}" loading="lazy"></a>')
+_selo_bloco = (f'''<div>
+     <span class="k">Selo que se atualiza sozinho</span>
+     <div class="usar-prev usar-selo"><a href="{CANONICA}"><img src="selo.png?v={META['data_base']}" width="320" height="100" alt="{_selo_alt}" loading="lazy" decoding="async"></a></div>
+     <textarea id="cod-selo" readonly rows="4" spellcheck="false" aria-label="Código HTML do selo">{esc(_selo_html)}</textarea>
+     <button type="button" class="copiar" data-alvo="cod-selo" hidden>Copiar código do selo</button>
+    </div>''') if TEM_SELO else ""
+USAR_HTML = f'''<div class="usar" id="usar">
+    <h3>Use este número no seu site</h3>
+    <p>Copie e cole onde for citar. O link leva o leitor para a base mais nova, e o selo troca o número
+     sozinho a cada atualização, sem você precisar editar nada.</p>
+    <div class="usar-g">
+    <div>
+     <span class="k">Frase com link</span>
+     <p class="usar-prev">{_frase_html}</p>
+     <textarea id="cod-frase" readonly rows="4" spellcheck="false" aria-label="Código HTML da frase com link">{esc(_frase_html)}</textarea>
+     <button type="button" class="copiar" data-alvo="cod-frase" hidden>Copiar código da frase</button>
+    </div>
+    {_selo_bloco}
+    </div>
+   </div>'''
+
+CSS += """
+/* usar este número (20/11/2026) */
+.usar{margin-top:30px;padding-top:20px;border-top:1px solid var(--ink);max-width:980px}
+.usar h3{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);font-weight:500;margin:0 0 8px}
+.usar>p{margin:0 0 18px;font-size:14.5px;color:var(--ink2);max-width:72ch;line-height:1.6}
+.usar-g{display:grid;grid-template-columns:1fr 1fr;gap:26px 40px}
+.usar-g>div{display:flex;flex-direction:column;gap:10px;min-width:0}
+.usar-prev{margin:0;padding:14px 16px;background:var(--sup);border:1px solid var(--borda);font-size:15px;line-height:1.55;color:var(--ink)}
+.usar-selo{display:flex;align-items:center;min-height:130px}
+.usar-selo img{display:block;max-width:100%;height:auto}
+.usar textarea{width:100%;resize:vertical;padding:10px 12px;border:1px solid var(--borda);border-left:2px solid var(--acento);
+ background:var(--sup2);color:var(--ink);font:12px/1.6 var(--mono);overflow-wrap:anywhere}
+.usar textarea:focus-visible{outline:2px solid var(--tinta);outline-offset:1px}
+.copiar{align-self:flex-start;min-height:44px;padding:0 16px;border:1px solid var(--ink);background:transparent;color:var(--ink);
+ font:500 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.copiar:hover{background:var(--ink);color:var(--papel)}
+.copiar:focus-visible{outline:2px solid var(--tinta);outline-offset:2px}
+.mudo{color:var(--mudo);font-size:13px}
+@media(max-width:760px){.usar-g{grid-template-columns:1fr}}
+@media print{.copiar{display:none}}
+"""
+
 JS = """<script>
+(function(){[].forEach.call(document.querySelectorAll(".copiar"),function(b){var t=document.getElementById(b.getAttribute("data-alvo"));if(!t)return;b.hidden=false;var rot=b.textContent;
+b.addEventListener("click",function(){t.select();var ok=function(){b.textContent="Copiado";setTimeout(function(){b.textContent=rot},1800)};
+if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t.value).then(ok,function(){try{document.execCommand("copy");ok()}catch(e){}})}else{try{document.execCommand("copy");ok()}catch(e){}}})})})();
 (function(){var r=document.documentElement,b=document.getElementById("tema");
 try{var t=localStorage.getItem("obs-tema");if(t)r.setAttribute("data-theme",t)}catch(e){}
 if(b)b.addEventListener("click",function(){var dk=r.getAttribute("data-theme")==="dark"||(!r.getAttribute("data-theme")&&matchMedia("(prefers-color-scheme:dark)").matches);var n=dk?"light":"dark";r.setAttribute("data-theme",n);try{localStorage.setItem("obs-tema",n)}catch(e){}});
@@ -1134,7 +1491,7 @@ html = f"""<!DOCTYPE html>
 <meta property="og:url" content="{CANONICA}">
 <meta property="og:locale" content="pt_BR">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#f2f4f2">
+{OG_META}<meta name="theme-color" content="#f2f4f2">
 <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
 <meta name="author" content="Irlen Menezes">
 <meta property="og:site_name" content="Irlen Menezes">
@@ -1152,12 +1509,14 @@ html = f"""<!DOCTYPE html>
    <span class="marca"><img src="irlen-mark.webp" width="26" height="26" alt="" decoding="async"><span class="marca-t"><span class="marca-n">Observatório do Drone no Brasil</span><span class="marca-p">por Irlen Menezes</span></span></span>
    <span><span class="k">Dados abertos</span><button class="tema" id="tema" type="button" aria-label="Alternar tema claro e escuro">Tema</button></span>
   </div>
-  <p class="atualiza">Dados oficiais da ANAC, base de <b>{data_br(META['data_base'])}</b> · apurado em <b>{data_br(META['processado_em'][:10])}</b> · <a href="#metodologia">como apuramos</a></p>
+  <p class="atualiza">Dados oficiais da ANAC, base de <b>{data_br(META['data_base'])}</b> · apurado em <b>{data_br(META['processado_em'][:10])}</b> · <a href="#metodologia">como apuramos</a> · <a href="#usar">citar este número</a></p>
   <div class="hero-g">
    <div>
     <span class="k">Relatório de cadastro · SISANT</span>
     <h1>Quantos drones tem no Brasil?</h1>
-    <p class="resposta" id="resposta">{RESPOSTA}</p>
+    <div class="resp" id="resposta">
+     <p class="resp-t">{RESPOSTA}</p>
+    </div>
     <p class="sub">O Observatório do Drone no Brasil conta cada aeronave, linha a linha, no arquivo público da ANAC{", e cruza a parte agro com o MAPA e o IBGE" if AG else ""}. {POR_EXTENSO.get(N_RECORTES, N_RECORTES)} recortes, cada um com o método
      declarado embaixo do gráfico, e os dados consolidados para baixar e conferir.</p>
     <p class="fonte">Fonte primária:
@@ -1171,7 +1530,7 @@ html = f"""<!DOCTYPE html>
     <strong class="fv">{num(T)}</strong>
     <p class="fd">{num(RES['pf'])} em nome de pessoa física e {num(RES['pj'])} em CNPJ,
      distribuídas entre {num(RES['cnpjs'])} empresas.</p>
-    <span class="fdelta">Pico: {num(pico['novos'])} emissões em {rotulo_mes(pico['mes'])}</span>
+    {HERO_GRAF}
    </div>
   </div>
  </div>
@@ -1243,7 +1602,8 @@ html = f"""<!DOCTYPE html>
    {AG["metodo_li"] if AG else ""}
    <li><strong>Quem apura.</strong> Irlen Menezes, cientista de dados formado pela PUC Minas, com
     experiência em legislação e regulação de drones no Brasil. Autor do blog de drones de
-    <a href="https://irlenmenezes.com.br/">irlenmenezes.com.br</a> e das ferramentas gratuitas para pilotos.</li>
+    <a href="https://irlenmenezes.com.br/">irlenmenezes.com.br</a> e das ferramentas gratuitas para pilotos.
+    ORCID: <a href="{ORCID_URL}" rel="noopener me">{ORCID}</a>.</li>
   </ol>
   </div>
  </section>
@@ -1270,6 +1630,7 @@ html = f"""<!DOCTYPE html>
       <dt>Baixar</dt><dd><a href="{JSON_ATUAL}">dados consolidados desta edição (JSON)</a> ·
        <a href="observatorio-drone-brasil.json">edição corrente</a> ·
        <a href="{META.get('fonte_url', 'https://sistemas.anac.gov.br/dadosabertos/')}" rel="noopener">arquivo bruto na ANAC (CSV)</a></dd>
+      <dt>Planilhas</dt><dd>{CSV_LINKS}<br><span class="mudo">CSV com ponto e vírgula, abre direto no Excel. Sempre a edição mais nova.</span></dd>
      </dl>
     </div>
     <div>
@@ -1286,6 +1647,7 @@ html = f"""<!DOCTYPE html>
 Apuração sobre o SISANT. Disponível em: {CANONICA}. DOI: {DOI}</code>
     Para entrevista, pauta ou pedido de recorte que não está aqui:
     <a href="https://irlenmenezes.com.br/contato/">fale comigo</a>.</div>
+   {USAR_HTML}
   </div>
  </section>
 </main>
@@ -1306,7 +1668,9 @@ Apuração sobre o SISANT. Disponível em: {CANONICA}. DOI: {DOI}</code>
 """
 
 # embrulha os SVG num container que rola no celular, sem a pagina rolar junto
-html = html.replace('<svg viewBox', '<div class="chw"><svg viewBox').replace('</svg>', '</svg></div>')
+# 21/11/2026: so os graficos (que comecam com '<svg viewBox') ganham o container; o replace
+# global de '</svg>' fechava um <div> a mais em qualquer outro SVG da pagina (ex.: o do saldo).
+html = re.sub(r'<svg viewBox.*?</svg>', lambda m: f'<div class="chw">{m.group(0)}</div>', html, flags=re.S)
 
 DESTINO.mkdir(parents=True, exist_ok=True)
 (DESTINO / "index.html").write_text(html, encoding="utf-8")
@@ -1365,11 +1729,58 @@ for v in ("hero-airspace.webm", "hero-airspace.mp4"):
     "</IfModule>\n"
     '<FilesMatch "\\.webm$">\n'
     "ForceType video/webm\n"
+    "</FilesMatch>\n"
+    # 20/11/2026: o servidor dá 1 ano de cache para imagem. O selo tem URL fixa (outros sites
+    # colam ele) e troca de número toda semana, então ganha cache curto. O CSV também.
+    '<FilesMatch "^selo\\.png$">\n'
+    "<IfModule mod_expires.c>\nExpiresActive On\nExpiresDefault \"access plus 6 hours\"\n</IfModule>\n"
+    "<IfModule mod_headers.c>\nHeader set Cache-Control \"public, max-age=21600\"\n</IfModule>\n"
+    "</FilesMatch>\n"
+    '<FilesMatch "\\.csv$">\n'
+    "ForceType text/csv\n"
+    "<IfModule mod_headers.c>\nHeader set Cache-Control \"public, max-age=21600\"\n</IfModule>\n"
     "</FilesMatch>\n", encoding="utf-8", newline="\n")  # LF: no Windows o padrão vira CRLF
 
+# ------------------------------------------------ planilhas CSV (20/11/2026)
+# Mesmos números das tabelas da página. ; como separador, vírgula decimal e BOM: é assim que o
+# Excel em português abre sem pedir importação. Última coluna = base da ANAC, para quem copiar
+# a planilha não perder de que data é o número.
+def _pc(x, casas=2):
+    return f"{x * 100:.{casas}f}".replace(".", ",")
+
+
+def _csv(nome, cab, linhas):
+    import csv
+    import io
+    buf = io.StringIO()
+    w = csv.writer(buf, delimiter=";", lineterminator="\r\n")
+    w.writerow(cab + ["base_anac"])
+    for ln in linhas:
+        w.writerow(list(ln) + [META["data_base"]])
+    (DESTINO / "csv" / f"{nome}.csv").write_text("\ufeff" + buf.getvalue(), encoding="utf-8", newline="")
+
+
+(DESTINO / "csv").mkdir(exist_ok=True)
+_csv("resumo", ["indicador", "valor"], [
+    ["aeronaves_cadastradas", T], ["aeronaves_em_cpf", RES["pf"]], ["aeronaves_em_cnpj", RES["pj"]],
+    ["empresas_com_drone", RES["cnpjs"]], ["aeronaves_dji", dji["qtd"]], ["pct_dji", _pc(dji["qtd"] / T, 1)],
+    ["aeronaves_ate_250g", sub250], ["pct_ate_250g", _pc(sub250 / T, 1)],
+    ["registros_no_arquivo_anac", META["registros"]]])
+_csv("serie-mensal", ["mes", "emissoes", "acumulado_no_periodo", "mes_parcial"],
+     [[s["mes"], s["novos"], s["acumulado"], "sim" if s.get("parcial") else "nao"] for s in serie])
+_csv("vencimentos", ["mes", "cadastros_que_vencem"], [[v["mes"], v["qtd"]] for v in venc])
+_csv("empresas-por-uf", ["uf", "empresas", "pct_empresas", "frota", "frota_sem_shows_de_luz"],
+     [[uf, n, _pc(n / total_emp), uf_frota.get(uf, 0), uf_limpa.get(uf, 0)] for uf, n in uf_emp])
+_csv("modelos", ["modelo", "aeronaves", "pct_da_base"], [[m["modelo"].title(), m["qtd"], _pc(m["qtd"] / T)] for m in modelos])
+_csv("fabricantes", ["fabricante", "aeronaves", "pct_da_base"], [[f["marca"], f["qtd"], _pc(f["qtd"] / T)] for f in fabs])
+_csv("ramos", ["ramo_declarado", "aeronaves", "pct_da_base"], [[r, n, _pc(n / T)] for r, n in ramos])
+_csv("peso", ["faixa_de_peso", "aeronaves", "pct_da_base"], [[ROTULO_PESO[k], peso[k], _pc(peso[k] / T)] for k in ORDEM_PESO])
+print(f"csv: {len(CSVS)} planilhas em {DESTINO / 'csv'}")
+
+# changefreq weekly desde 20/11/2026 (a rotina roda toda segunda)
 (DESTINO / "sitemap.xml").write_text(
     '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n <url>\n'
-    f'  <loc>{CANONICA}</loc>\n  <lastmod>{META["processado_em"][:10]}</lastmod>\n  <changefreq>monthly</changefreq>\n'
+    f'  <loc>{CANONICA}</loc>\n  <lastmod>{META["processado_em"][:10]}</lastmod>\n  <changefreq>weekly</changefreq>\n'
     '  <priority>0.9</priority>\n </url>\n</urlset>\n', encoding="utf-8", newline="\n")
 
 kb = len(html.encode("utf-8")) / 1024

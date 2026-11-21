@@ -56,8 +56,12 @@ python consulta_uf.py
 # 3. apura, compara com a base de cerca de 30 dias antes (se houver snapshot) e gera a página
 python obs_apura.py      # -> obs-drone.json (aborta se uma checagem de consistência falhar)
 python obs_diff.py       # -> obs-diff.json (precisa de duas bases em snapshots/)
-python obs_build.py      # -> site/index.html + site/dados/
+python obs_build.py      # -> site/index.html + site/dados/ + site/csv/
 ```
+
+Com o Playwright e o Chrome instalados (`pip install playwright`), o `obs_build.py` também gera
+o cartão de compartilhamento e o selo, pelo `obs_card.py`. Sem eles a página sai do mesmo
+jeito, só sem essas duas imagens.
 
 Para incluir a seção Agro, rode antes do `obs_build.py`:
 
@@ -173,7 +177,8 @@ Nada disso sai daqui:
 |---|---|
 | `obs_apura.py` | Lê o CSV e gera `obs-drone.json` com todos os recortes. Versão do método e histórico ficam aqui. |
 | `obs_diff.py` | Compara a base atual com a base arquivada de cerca de 30 dias antes, por `CODIGO_AERONAVE`. |
-| `obs_build.py` | Gera a página estática (SVG inline, tabela por seção, JSON-LD com Dataset e perguntas frequentes, barra inferior no celular) e a pasta `dados/`. |
+| `obs_build.py` | Gera a página estática (SVG inline, tabela por seção, gráfico de abertura animado só com CSS, JSON-LD com Dataset e perguntas frequentes, barra inferior no celular), a pasta `dados/` e as planilhas em `csv/`. |
+| `obs_card.py` | Gera o cartão de compartilhamento (`og:image`, com a data da base no nome) e o selo `selo.png` que outros sites podem colar. Opcional: usa o Playwright com o Chrome. |
 | `apura_uf.py`, `consulta_uf.py` | Agregam a frota por CNPJ e consultam a UF (minhareceita.org, BrasilAPI como reserva). |
 | `obs_mapa_baixa.py` | Baixa o CSV de registro de aviação agrícola do MAPA e guarda um snapshot datado em `snapshots/mapa/` (fora do repositório). |
 | `obs_agro.py` | Apura a seção Agro: regra do drone agrícola, cruzamento ANAC x MAPA, PAM, checagens e varredura de privacidade. Gera `obs-agro.json`. |
@@ -188,6 +193,9 @@ Nada disso sai daqui:
 
 Os JSONs em `dados/` são **consolidados e agregados**. Os arquivos brutos (o CSV da ANAC e o
 do MAPA) não são redistribuídos aqui: os registros individuais ficam nas fontes oficiais.
+
+A página também oferece as tabelas principais em CSV (separador `;`, vírgula decimal), refeitas
+a cada edição, na seção "Dados, versões e citação".
 
 ## Versões
 
@@ -219,3 +227,5 @@ Irlen Menezes, cientista de dados formado pela PUC Minas, com experiência em le
 regulação de drones no Brasil. Autor do blog de drones de https://irlenmenezes.com.br e das
 ferramentas gratuitas para pilotos. Entrevista, pauta ou pedido de recorte:
 https://irlenmenezes.com.br/contato/
+
+ORCID: [0009-0001-7988-0340](https://orcid.org/0009-0001-7988-0340)

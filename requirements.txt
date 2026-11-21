@@ -1,5 +1,7 @@
 # A apuração do SISANT, a seção Agro e a página usam só a biblioteca padrão do Python 3.11+.
-# Única exceção, opcional: obs_mapa_baixa.py baixa o CSV do MAPA com o Chrome instalado,
-# porque o servidor do MAPA derruba curl e urllib. Quem baixar o arquivo à mão não precisa disto.
+# Única dependência externa, opcional: o Playwright com o Chrome instalado, usado por dois scripts.
+#   obs_mapa_baixa.py baixa o CSV do MAPA, porque o servidor do MAPA derruba curl e urllib.
+#     Quem baixar o arquivo à mão não precisa disto.
+#   obs_card.py gera o cartão de compartilhamento e o selo. Sem ele, a página sai sem essas imagens.
 #   pip install playwright
-playwright>=1.40  # opcional, só para obs_mapa_baixa.py
+playwright>=1.40  # opcional: obs_mapa_baixa.py e obs_card.py

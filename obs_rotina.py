@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Rotina mensal do Observatório do Drone (20/09/2026).
+"""Rotina semanal do Observatório do Drone (criada mensal em 20/09/2026; semanal desde 17/11/2026).
 
 Baixa a base SISANT da ANAC, e SÓ SE a data da base for mais nova que a publicada:
 guarda snapshot, resolve UF dos CNPJs novos, apura, gera a página, publica no servidor,
@@ -7,7 +7,9 @@ purga o cache e avisa o IndexNow. Grava tudo em obs_rotina.log e um resumo em ob
 
 Uso manual:  python obs_rotina.py            (respeita a checagem de data)
              python obs_rotina.py --forcar   (reprocessa mesmo sem base nova)
-Agendada no Windows (Task Scheduler): tarefa "Observatorio Drone mensal", dia 1, 09:00, roda se perdeu o horário.
+Agendada no Windows (Task Scheduler): tarefa "Observatorio Drone semanal", segunda 09:00, roda se perdeu o horário.
+Desde 20/11/2026 sobem junto: og/ (cartão de compartilhamento datado), selo.png, csv/ e o .htaccess da pasta
+(cache curto do selo e do CSV). Cartões com mais de 35 dias são apagados no servidor.
 
 Seção Agro (14/11/2026): a cada execução baixa também o registro de aviação agrícola do MAPA
 (obs_mapa_baixa.py, snapshot em snapshots/mapa/) e, quando a página é regerada, apura o
@@ -115,7 +117,8 @@ PESSOAL = [("e-mail", re.compile(r"[\w.+-]+@[\w-]+\.[a-z]{2,}[\w.-]*", re.I)),
 def varre_saida():
     """Problemas de privacidade no que vai ser publicado (vazio = ok)."""
     probs = []
-    alvos = [SAIDA / "index.html", SAIDA / "observatorio-drone-brasil.json"] + sorted((SAIDA / "dados").glob("*.json"))
+    alvos = ([SAIDA / "index.html", SAIDA / "observatorio-drone-brasil.json"] + sorted((SAIDA / "dados").glob("*.json"))
+             + sorted((SAIDA / "csv").glob("*.csv")))  # csv/ desde 20/11/2026
     for arq in alvos:
         if not arq.exists():
             continue
@@ -193,10 +196,12 @@ def main():
         RESUMO.write_text(f"{dt.datetime.now():%d/%m/%Y %H:%M}: base {nova} apurada e gerada em {SAIDA} (sem publicar).\n", encoding="utf-8")
         return 0
     # dados/ leva a edicao datada e o diff: cada base publicada fica conferivel depois
-    tarcmd = [TAR, "-C", str(SAIDA), "-cf", "-", "index.html", "observatorio-drone-brasil.json", "sitemap.xml", "dados", "irlen-mark.webp"]
+    extras = [n for n in ("og", "selo.png", "csv", ".htaccess") if (SAIDA / n).exists()]  # 20/11/2026
+    tarcmd = [TAR, "-C", str(SAIDA), "-cf", "-", "index.html", "observatorio-drone-brasil.json", "sitemap.xml", "dados", "irlen-mark.webp"] + extras
     # backup do index anterior; se ja existe um da mesma base (reprocessamento), nao sobrescreve
     bak = f"~/observatorio-index.bak_{nova.replace('-', '')}"
     remoto = (f"set -e; cd {REMOTO} && b={bak}; if [ -e $b ]; then b=${{b}}_$(date +%H%M%S); fi; cp index.html $b && tar -xf - "
+              f"&& (find og -name 'observatorio-drone-brasil-*.png' -mtime +35 -delete 2>/dev/null || true) "
               f"&& cd .. && wp litespeed-purge all | tail -1")
     log("publicando...")
     p1 = subprocess.Popen(tarcmd, stdout=subprocess.PIPE)

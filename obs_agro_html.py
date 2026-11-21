@@ -29,6 +29,7 @@ i.g1{background:var(--eixo)} i.hi{background:var(--hi)}
 .tw.fixa1 th:first-child,.tw.fixa1 td:first-child{position:sticky;left:0;z-index:1;background:var(--papel)}
 .tw.fixa1 tbody tr:hover td:first-child{background:var(--sup2)}
 .tw-cap{margin:8px 0 0;font-size:12.5px;color:var(--mudo);line-height:1.55;max-width:72ch}
+caption.vh{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .tw-cap+.tw{margin-top:20px}
 .agro-lim ol{margin:0;padding-left:20px}
 .agro-lim li{margin:0 0 9px;font-size:14px;line-height:1.65;color:var(--ink2)}
@@ -72,9 +73,13 @@ def monta(AG, h):
         ths = "".join(f"<th{' class=n' if i else ''}>{esc(c)}</th>" for i, c in enumerate(cab))
         trs = "".join("<tr>" + "".join(f"<td{' class=n' if i else ''}>{c}</td>" for i, c in enumerate(ln)) + "</tr>"
                       for ln in linhas)
-        return (f'<div class="tw{" fixa1" if fixa else ""}"><table aria-describedby="{cid}">'
+        # 20/11/2026: <caption> invisível dá o título "oficial" da tabela (leitor de tela e robô de IA
+        # leem como título); a legenda visível continua fora da rolagem, escondida do leitor de tela
+        # para não ler o mesmo texto duas vezes.
+        return (f'<div class="tw{" fixa1" if fixa else ""}"><table>'
+                f'<caption class="vh">{esc(resumo)}</caption>'
                 f'<thead><tr>{ths}</tr></thead><tbody>{trs}</tbody></table></div>'
-                f'<p class="tw-cap" id="{cid}">{esc(resumo)}</p>')
+                f'<p class="tw-cap" id="{cid}" aria-hidden="true">{esc(resumo)}</p>')
 
     db = data_br(M["base_anac"])
     dm = data_br(M["mapa_arquivo_de"]) if M.get("mapa_arquivo_de") else "data não informada"
@@ -123,7 +128,8 @@ def monta(AG, h):
         "agro", titulo1,
         f"A ANAC tem {num(T)} drones agrícolas com cadastro vigente. Pelo número da aeronave, {num(no)} aparecem em "
         f"algum registro ativo de aviação agrícola do MAPA, que a Portaria 298/2021 exige de quem faz aplicação com "
-        f"drone. Em nome de empresa a fatia é de {pct(no_pj / pj)}. Em nome de pessoa física, cai para {pct(no_pf / pf)}.",
+        f"drone. Em nome de empresa a fatia é de {pct(no_pj / pj)}. Em nome de pessoa física, cai para {pct(no_pf / pf)}. "
+        f'A conta completa, drone a drone e estado por estado, está <a href="https://irlenmenezes.com.br/drones-agricolas-anac-registro-mapa-sipeagro-cruzamento-2026/">no post sobre o cruzamento ANAC x MAPA</a>.',
         tiles_html + duo + legenda,
         nota=f"Drone agrícola aqui é quem declarou o ramo de pulverização no SISANT ({num(F['pelo_ramo'])}) mais quem "
              f"cadastrou modelo de pulverizador (Agras, XAG, EAVision e parecidos) em outro ramo, com 2 kg ou mais "
@@ -303,7 +309,8 @@ def monta(AG, h):
         f"({top['uf']}), com {num(top['area_plantada_ha'])} hectares. Em {UF_NOME.get(ud['uf'], ud['uf'])}, "
         f"{num(ud['sem_operador'])} dos {num(ud['municipios'])} municípios não têm operador do MAPA sediado, e eles somam "
         f"{mi(ud['area_sem_operador_ha'])} milhões de hectares plantados. É um retrato de onde ficam as sedes, não de "
-        f"onde se pulveriza.",
+        f"onde se pulveriza. As sedes das empresas de pulverização, cidade por cidade, estão "
+        f'<a href="https://irlenmenezes.com.br/onde-estao-cnpjs-de-pulverizacao-com-drone-mapa-por-municipio-sisant-2026/">no mapa do cadastro por município</a>.',
         barras_mun,
         nota=f"Cada operador do MAPA foi ligado ao código IBGE do município pelo endereço cadastrado "
              f"({num(MUN['operadores_com_municipio_ibge'])} de {num(op)} casaram; o resto é distrito ou grafia que não "
